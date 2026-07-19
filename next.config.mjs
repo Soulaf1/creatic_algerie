@@ -1,7 +1,3 @@
-const nextConfig = {
-  turbopack: {
-    root: __dirname,
-  },
-};
+const nextConfig = {};
 
 export default nextConfig;
