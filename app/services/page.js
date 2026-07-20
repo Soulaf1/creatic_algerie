@@ -76,8 +76,7 @@ export default function ServicesPage() {
               ))}
             </div>
           </div>
-          <div className="flex-1 relative w-full h-[250px] sm:h-[320px]  rounded-2xl overflow-hidden">
-            <Image src="/website.png" alt="Sites Web" fill sizes="(max-width: 768px) 100vw, 50vw" className="object-contain p-4" />
+<div className="flex-1 relative w-full min-h-[200px] sm:h-[320px] rounded-2xl overflow-hidden">            <Image src="/website.png" alt="Sites Web" fill sizes="(max-width: 768px) 100vw, 50vw" className="object-contain p-4" />
           </div>
         </div>
       </section>
@@ -108,7 +107,7 @@ export default function ServicesPage() {
               ))}
             </div>
           </div>
-          <div className="flex-1 relative w-full h-[250px] sm:h-[320px] bg-[#EFF4FF] rounded-2xl overflow-hidden">
+          <div className="flex-1 relative w-full min-h-[200px] sm:h-[320px] bg-[#EFF4FF] rounded-2xl overflow-hidden">
             <Image src="/ecommerce.png" alt="E-commerce" fill sizes="(max-width: 768px) 100vw, 50vw" className="object-contain p-4" />
           </div>
         </div>
@@ -133,8 +132,7 @@ export default function ServicesPage() {
               ))}
             </div>
           </div>
-          <div className="flex-1 relative w-full h-[250px] sm:h-[320px]  rounded-2xl overflow-hidden">
-            <Image src="/appmobile.png" alt="Apps Mobiles" fill sizes="(max-width: 768px) 100vw, 50vw" className="object-contain p-4" />
+<div className="flex-1 relative w-full min-h-[200px] sm:h-[320px] rounded-2xl overflow-hidden">            <Image src="/appmobile.png" alt="Apps Mobiles" fill sizes="(max-width: 768px) 100vw, 50vw" className="object-contain p-4" />
           </div>
         </div>
       </section>
@@ -161,7 +159,7 @@ export default function ServicesPage() {
               ))}
             </div>
           </div>
-          <div className="flex-1 relative w-full h-[250px] sm:h-[320px] bg-[#EFF4FF] rounded-2xl overflow-hidden">
+          <div className="flex-1 relative w-full min-h-[200px] sm:h-[320px] bg-[#EFF4FF] rounded-2xl overflow-hidden">
             <Image src="/maintenance.png" alt="Maintenance" fill sizes="(max-width: 768px) 100vw, 50vw" className="object-contain p-4" />
           </div>
         </div>
@@ -189,8 +187,7 @@ export default function ServicesPage() {
         ))}
       </div>
     </div>
-    <div className="flex-1 relative w-full h-[250px] sm:h-[320px] rounded-2xl overflow-hidden">
-      <Image src="/hebergement.png" alt="Hébergement Web" fill sizes="(max-width: 768px) 100vw, 50vw" className="object-contain" />
+<div className="flex-1 relative w-full min-h-[200px] sm:h-[320px] rounded-2xl overflow-hidden">      <Image src="/hebergement.png" alt="Hébergement Web" fill sizes="(max-width: 768px) 100vw, 50vw" className="object-contain" />
     </div>
   </div>
 </section>
