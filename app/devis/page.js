@@ -20,16 +20,163 @@ const inter = Inter({
   weight: ['400', '500'],
 });
 
+const wilayas = [
+  'Adrar', 'Chlef', 'Laghouat', 'Oum El Bouaghi', 'Batna', 'Béjaïa', 'Biskra',
+  'Béchar', 'Blida', 'Bouira', 'Tamanrasset', 'Tébessa', 'Tlemcen', 'Tiaret',
+  'Tizi Ouzou', 'Alger', 'Djelfa', 'Jijel', 'Sétif', 'Saïda', 'Skikda',
+  'Sidi Bel Abbès', 'Annaba', 'Guelma', 'Constantine', 'Médéa', 'Mostaganem',
+  'M\'Sila', 'Mascara', 'Ouargla', 'Oran', 'El Bayadh', 'Illizi',
+  'Bordj Bou Arréridj', 'Boumerdès', 'El Tarf', 'Tindouf', 'Tissemsilt',
+  'El Oued', 'Khenchela', 'Souk Ahras', 'Tipaza', 'Mila', 'Aïn Defla',
+  'Naâma', 'Aïn Témouchent', 'Ghardaïa', 'Relizane', 'Timimoun',
+  'Bordj Badji Mokhtar', 'Ouled Djellal', 'Béni Abbès', 'In Salah',
+  'In Guezzam', 'Touggourt', 'Djanet', 'El M\'Ghair', 'El Meniaa',
+];
+
+function FAQ({ hanken, inter }) {
+  const [open, setOpen] = useState(null);
+
+  const questions = [
+    {
+      q: 'Combien de temps pour recevoir mon devis ?',
+      r: 'Nous répondons à chaque demande sous 24 à 48 heures ouvrables avec une proposition technique et financière détaillée.',
+    },
+    {
+      q: 'Comment se déroule l\'estimation ?',
+      r: 'Après réception de votre demande, nos ingénieurs analysent vos besoins techniques et vous contactent pour un premier appel de cadrage gratuit.',
+    },
+    {
+      q: 'Quels sont vos délais moyens ?',
+      r: 'Cela dépend de la complexité. Un prototype MVP prend généralement 4 à 6 semaines, tandis qu\'une plateforme entreprise peut prendre 3 à 6 mois.',
+    },
+    {
+      q: 'Le devis est-il vraiment gratuit ?',
+      r: 'Oui, notre devis est 100% gratuit et sans engagement. Vous n\'êtes pas obligé de donner suite à notre proposition.',
+    },
+    {
+      q: 'Proposez-vous du support après lancement ?',
+      r: 'Oui, nous offrons des contrats de maintenance tierce applicative (TMA) pour garantir la stabilité et l\'évolution de vos solutions 24/7.',
+    },
+  ];
+
+  return (
+    <div className="flex flex-col gap-3">
+      {questions.map((item, i) => (
+        <div key={i} className="border border-gray-200 rounded-xl overflow-hidden">
+          <button
+            onClick={() => setOpen(open === i ? null : i)}
+            className={`w-full flex items-center justify-between px-6 py-4 text-left bg-white hover:bg-[#E5EEFF] transition-colors ${hanken.className}`}
+          >
+            <span className={`text-[#052E78] font-semibold text-base sm:text-lg ${hanken.className}`}>
+              {item.q}
+            </span>
+            <span className={`text-[#052E78] text-lg font-bold transition-transform duration-300 ${open === i ? 'rotate-180' : ''}`}>
+              ⌄
+            </span>
+          </button>
+          {open === i && (
+            <div className={`px-6 py-4 bg-[#E5EEFF] text-[#444651] text-sm leading-relaxed ${inter.className}`}>
+              {item.r}
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export default function DevisPage() {
   const [cahierDesCharges, setCahierDesCharges] = useState(false);
   const [fichier, setFichier] = useState(null);
+  const [errors, setErrors] = useState({});
+const [loading, setLoading] = useState(false);
+const [statusMsg, setStatusMsg] = useState(null); // { type: 'success' | 'error', text: '' }
+  const [form, setForm] = useState({
+    nom: '',
+    entreprise: '',
+    telephone: '',
+    email: '',
+    wilaya: '',
+    typeService: 'Création de site web',
+    budget: 'Moins de 100 000 DA',
+    delai: 'Flexible',
+    description: '',
+  });
 
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+    setErrors({ ...errors, [e.target.name]: '' });
+  };
+
+  const validate = () => {
+    const newErrors = {};
+    if (!form.nom.trim()) newErrors.nom = 'Ce champ est obligatoire';
+    if (!form.telephone.trim()) newErrors.telephone = 'Ce champ est obligatoire';
+    if (!form.email.trim()) newErrors.email = 'Ce champ est obligatoire';
+    else if (!/\S+@\S+\.\S+/.test(form.email)) newErrors.email = 'Email invalide';
+    if (!form.wilaya) newErrors.wilaya = 'Veuillez sélectionner votre wilaya';
+    if (!form.description.trim()) newErrors.description = 'Ce champ est obligatoire';
+    return newErrors;
+  };
+
+
+const handleSubmit = async () => {
+  const newErrors = validate();
+  if (Object.keys(newErrors).length > 0) {
+    setErrors(newErrors);
+    return;
+  }
+
+  setLoading(true);
+  setStatusMsg(null);
+
+  try {
+    const formData = new FormData();
+    Object.entries(form).forEach(([key, value]) => formData.append(key, value));
+    formData.append('cahierDesCharges', cahierDesCharges);
+    if (fichier) formData.append('fichier', fichier);
+
+    const res = await fetch('/api/devis', {
+      method: 'POST',
+      body: formData,
+    });
+
+    const result = await res.json();
+
+    if (!res.ok || !result.success) {
+      if (result.errors) setErrors(result.errors);
+      throw new Error(result.message || 'Erreur serveur');
+    }
+
+    setStatusMsg({
+      type: 'success',
+      text: 'Merci ! Votre demande a été envoyée. Nous revenons vers vous sous 48h.',
+    });
+
+    // Réinitialiser le formulaire
+    setForm({
+      nom: '', entreprise: '', telephone: '', email: '', wilaya: '',
+      typeService: 'Création de site web', budget: 'Moins de 100 000 DA',
+      delai: 'Flexible', description: '',
+    });
+    setFichier(null);
+    setCahierDesCharges(false);
+
+  } catch (err) {
+    setStatusMsg({
+      type: 'error',
+      text: 'Une erreur est survenue. Merci de réessayer ou de nous contacter directement.',
+    });
+  } finally {
+    setLoading(false);
+  }
+};
   return (
-    <main className="bg-white py-12 sm:py-20">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6">
+    <main>
 
-        {/* Titre */}
-        <div className="mb-8">
+      {/* Section titre — fond blanc */}
+      <div className="bg-white py-12 sm:py-16">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className={`inline-flex items-center gap-2 border border-[#444651] text-green-500 text-xs px-3 py-1.5 rounded-full mb-3 ${inter.className}`}>
             ⏱ Réponse sous 24-48h
           </div>
@@ -40,187 +187,291 @@ export default function DevisPage() {
             Devis personnalisé et sans engagement. Partagez-nous vos ambitions digitales et recevez une proposition technique et financière détaillée.
           </p>
         </div>
-
-        <div className="flex flex-col lg:flex-row gap-8">
-
-          {/* Formulaire */}
-          <div className="flex-1 flex flex-col gap-6">
-
-            {/* Informations de contact */}
-            <div className="border border-gray-200 rounded-2xl p-6">
-              <h2 className={`text-[#052E78] font-bold text-lg mb-6 border-l-4 border-[#052E78] pl-3 ${hanken.className}`}>
-                Informations de contact
-              </h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className={`text-[#052E78] text-sm font-medium mb-1 block ${inter.className}`}>Nom et prénom *</label>
-                  <input type="text" placeholder="Ex: Mohamed Amine" className={`w-full bg-[#E5EEFF] border-none rounded-lg px-4 py-2.5 text-sm text-[#444651] focus:outline-none focus:ring-2 focus:ring-[#052E78] ${inter.className}`} />
-                </div>
-                <div>
-                  <label className={`text-[#052E78] text-sm font-medium mb-1 block ${inter.className}`}>Entreprise / Organisation</label>
-                  <input type="text" placeholder="Nom de votre société" className={`w-full bg-[#E5EEFF] border-none rounded-lg px-4 py-2.5 text-sm text-[#444651] focus:outline-none focus:ring-2 focus:ring-[#052E78] ${inter.className}`} />
-                </div>
-                <div>
-                  <label className={`text-[#052E78] text-sm font-medium mb-1 block ${inter.className}`}>Téléphone *</label>
-                  <input type="tel" placeholder="0500 XX XX XX" className={`w-full bg-[#E5EEFF] border-none rounded-lg px-4 py-2.5 text-sm text-[#444651] focus:outline-none focus:ring-2 focus:ring-[#052E78] ${inter.className}`} />
-                </div>
-                <div>
-                  <label className={`text-[#052E78] text-sm font-medium mb-1 block ${inter.className}`}>Email *</label>
-                  <input type="email" placeholder="contact@exemple.com" className={`w-full bg-[#E5EEFF] border-none rounded-lg px-4 py-2.5 text-sm text-[#444651] focus:outline-none focus:ring-2 focus:ring-[#052E78] ${inter.className}`} />
-                </div>
-                <div className="sm:col-span-2">
-                  <label className={`text-[#052E78] text-sm font-medium mb-1 block ${inter.className}`}>Wilaya / Ville</label>
-                  <input type="text" placeholder="Ex: Alger, Oran..." className={`w-full bg-[#E5EEFF] border-none rounded-lg px-4 py-2.5 text-sm text-[#444651] focus:outline-none focus:ring-2 focus:ring-[#052E78] ${inter.className}`} />
-                </div>
-              </div>
-            </div>
-
-            {/* Détails du projet */}
-            <div className="border border-gray-200 rounded-2xl p-6">
-              <h2 className={`text-[#052E78] font-bold text-lg mb-6 border-l-4 border-[#052E78] pl-3 ${hanken.className}`}>
-                Détails du projet
-              </h2>
-              <div className="flex flex-col gap-4">
-
-                {/* Type + Budget sur la même ligne */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className={`text-[#052E78] text-sm font-medium mb-1 block ${inter.className}`}>Type de service *</label>
-                    <select className={`w-full bg-[#E5EEFF] border-none rounded-lg px-4 py-2.5 text-sm text-[#444651] focus:outline-none focus:ring-2 focus:ring-[#052E78] ${inter.className}`}>
-                      <option>Création de site web</option>
-                      <option>Refonte de site existant</option>
-                      <option>E-commerce</option>
-                      <option>Plateforme spécifique (métier)</option>
-                      <option>Application mobile (Android, iOS)</option>
-                      <option>Marketing digital</option>
-                      <option>SEO / Référencement</option>
-                      <option>Identité visuelle / Branding</option>
-                      <option>Autre</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className={`text-[#052E78] text-sm font-medium mb-1 block ${inter.className}`}>Budget estimatif</label>
-                    <select className={`w-full bg-[#E5EEFF] border-none rounded-lg px-4 py-2.5 text-sm text-[#444651] focus:outline-none focus:ring-2 focus:ring-[#052E78] ${inter.className}`}>
-                      <option>Moins de 100 000 DA</option>
-                      <option>100 000 – 200 000 DA</option>
-                      <option>200 000 – 400 000 DA</option>
-                      <option>Plus de 400 000 DA</option>
-                      <option>À définir avec l'agence</option>
-                    </select>
-                  </div>
-                </div>
-
-                {/* Délai */}
-                <div>
-                  <label className={`text-[#052E78] text-sm font-medium mb-1 block ${inter.className}`}>Délai souhaité</label>
-                  <select className={`w-full bg-[#E5EEFF] border-none rounded-lg px-4 py-2.5 text-sm text-[#444651] focus:outline-none focus:ring-2 focus:ring-[#052E78] ${inter.className}`}>
-                    <option>Urgent (moins d'1 mois)</option>
-                    <option>1-3 mois</option>
-                    <option>Flexible</option>
-                  </select>
-                </div>
-
-                {/* Description */}
-                <div>
-                  <label className={`text-[#052E78] text-sm font-medium mb-1 block ${inter.className}`}>Description du projet *</label>
-                  <textarea
-                    rows={5}
-                    placeholder="Décrivez votre projet, vos objectifs, et tout élément qui nous aidera à mieux comprendre votre besoin..."
-                    className={`w-full bg-[#E5EEFF] border-none rounded-lg px-4 py-2.5 text-sm text-[#444651] focus:outline-none focus:ring-2 focus:ring-[#052E78] resize-none ${inter.className}`}
-                  />
-                </div>
-
-                {/* Cahier des charges */}
-                <div>
-                  <label className={`flex items-center gap-2 cursor-pointer ${inter.className}`}>
-                    <input
-                      type="checkbox"
-                      checked={cahierDesCharges}
-                      onChange={(e) => setCahierDesCharges(e.target.checked)}
-                      className="w-4 h-4 accent-[#052E78]"
-                    />
-                    <span className={`text-[#444651] text-sm ${inter.className}`}>
-                      Avez-vous déjà un cahier des charges ?
-                    </span>
-                  </label>
-                  {cahierDesCharges && (
-                    <div className="mt-3">
-                      <label className={`block text-[#052E78] text-sm font-medium mb-1 ${inter.className}`}>Joindre votre fichier</label>
-                      <input
-                        type="file"
-                        onChange={(e) => setFichier(e.target.files[0])}
-                        className={`w-full bg-[#E5EEFF] border border-dashed border-[#052E78] rounded-lg px-4 py-3 text-sm text-[#444651] cursor-pointer ${inter.className}`}
-                      />
-                      {fichier && (
-                        <p className={`text-green-500 text-xs mt-1 ${inter.className}`}>✓ {fichier.name}</p>
-                      )}
-                    </div>
-                  )}
-                </div>
-
-              </div>
-            </div>
-
-            {/* Bouton + texte réassurance */}
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-              <p className={`text-[#444651] text-xs ${inter.className}`}>
-                🔒 Vos informations restent confidentielles. Aucun engagement de votre part.
-              </p>
-              <button className={`bg-[#052E78] text-white px-8 py-2.5 rounded-lg text-sm font-medium hover:bg-[#041f52] transition-all duration-300 hover:scale-105 whitespace-nowrap ${poppins.className}`}>
-                Envoyer ma demande
-              </button>
-            </div>
-
-          </div>
-
-          {/* Sidebar droite */}
-          <div className="lg:w-80 flex flex-col gap-6">
-
-  {[
-  { icon: <Zap size={16} />, titre: 'Réponse rapide', desc: 'Nous répondons à chaque demande en moins de 48 heures.' },
-  { icon: <FileText size={16} />, titre: 'Devis 100% personnalisé', desc: 'Pas de pack standard, une solution adaptée à votre budget.' },
-  { icon: <Users size={16} />, titre: 'Équipe locale & disponible', desc: 'Rencontrez nos experts dans tous les bureaux à Alger.' },
-].map((item, i) => (
-  <div key={i} className="flex items-start gap-3 ">
-    <span className="w-8 h-8 bg-green-50 rounded-full flex items-center justify-center text-green-500 flex-shrink-0">
-      {item.icon}
-    </span>
-    <div>
-      <p className={`text-[#052E78] font-semibold text-sm ${hanken.className}`}>{item.titre}</p>
-      <p className={`text-[#444651] text-xs ${inter.className}`}>{item.desc}</p>
-    </div>
-  </div>
-))}
-
- {/* Besoin d'aide */}
-<div className="bg-[#052E78] rounded-2xl p-6">
-  <h3 className={`text-white font-bold text-base mb-4 ${hanken.className}`}>
-    Besoin d'aide ?
-  </h3>
-  <div className="flex flex-col gap-3 mb-4">
-    {[
-      { icon: <Phone size={16} />, text: '+213 (0) 23 00 00 00' },
-      { icon: <MessageCircle size={16} />, text: 'WhatsApp Direct' },
-      { icon: <Mail size={16} />, text: 'contact@creatic-algerie.com' },
-    ].map((item, i) => (
-      <div key={i} className={`flex items-center gap-2 text-white text-sm ${inter.className}`}>
-        <span className="text-white">{item.icon}</span>
-        {item.text}
       </div>
-    ))}
+
+      {/* Section formulaire */}
+      <div className="bg-[#E5EEFF] py-12">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          <div className="flex flex-col lg:flex-row gap-8">
+
+            {/* Formulaire */}
+            <div className="flex-1 flex flex-col gap-6">
+
+              {/* Informations de contact */}
+              <div className="bg-white border border-gray-200 rounded-2xl p-6">
+                <h2 className={`text-[#052E78] font-bold text-lg mb-6 border-l-4 border-[#052E78] pl-3 ${hanken.className}`}>
+                  Informations de contact
+                </h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+                  <div>
+                    <label className={`text-[#052E78] text-sm font-medium mb-1 block ${inter.className}`}>Nom et prénom *</label>
+                    <input
+                      type="text"
+                      name="nom"
+                      value={form.nom}
+                      onChange={handleChange}
+                      placeholder="Ex: Mohamed Amine"
+                      className={`w-full bg-[#E5EEFF] border-none rounded-lg px-4 py-2.5 text-sm text-[#444651] focus:outline-none focus:ring-2 focus:ring-[#052E78] ${inter.className}`}
+                    />
+                    {errors.nom && <p className="text-red-500 text-xs mt-1">{errors.nom}</p>}
+                  </div>
+
+                  <div>
+                    <label className={`text-[#052E78] text-sm font-medium mb-1 block ${inter.className}`}>Entreprise / Organisation</label>
+                    <input
+                      type="text"
+                      name="entreprise"
+                      value={form.entreprise}
+                      onChange={handleChange}
+                      placeholder="Nom de votre société"
+                      className={`w-full bg-[#E5EEFF] border-none rounded-lg px-4 py-2.5 text-sm text-[#444651] focus:outline-none focus:ring-2 focus:ring-[#052E78] ${inter.className}`}
+                    />
+                  </div>
+
+                  <div>
+                    <label className={`text-[#052E78] text-sm font-medium mb-1 block ${inter.className}`}>Téléphone *</label>
+                    <input
+                      type="tel"
+                      name="telephone"
+                      value={form.telephone}
+                      onChange={handleChange}
+                      placeholder="0500 XX XX XX"
+                      className={`w-full bg-[#E5EEFF] border-none rounded-lg px-4 py-2.5 text-sm text-[#444651] focus:outline-none focus:ring-2 focus:ring-[#052E78] ${inter.className}`}
+                    />
+                    {errors.telephone && <p className="text-red-500 text-xs mt-1">{errors.telephone}</p>}
+                  </div>
+
+                  <div>
+                    <label className={`text-[#052E78] text-sm font-medium mb-1 block ${inter.className}`}>Email *</label>
+                    <input
+                      type="email"
+                      name="email"
+                      value={form.email}
+                      onChange={handleChange}
+                      placeholder="contact@exemple.com"
+                      className={`w-full bg-[#E5EEFF] border-none rounded-lg px-4 py-2.5 text-sm text-[#444651] focus:outline-none focus:ring-2 focus:ring-[#052E78] ${inter.className}`}
+                    />
+                    {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
+                  </div>
+
+                  <div className="sm:col-span-2">
+                    <label className={`text-[#052E78] text-sm font-medium mb-1 block ${inter.className}`}>Wilaya *</label>
+                    <select
+                      name="wilaya"
+                      value={form.wilaya}
+                      onChange={handleChange}
+                      className={`w-full bg-[#E5EEFF] border-none rounded-lg px-4 py-2.5 text-sm text-[#444651] focus:outline-none focus:ring-2 focus:ring-[#052E78] ${inter.className}`}
+                    >
+                      <option value="">Sélectionnez votre wilaya</option>
+                      {wilayas.map((w, i) => (
+                        <option key={i} value={w}>{w}</option>
+                      ))}
+                    </select>
+                    {errors.wilaya && <p className="text-red-500 text-xs mt-1">{errors.wilaya}</p>}
+                  </div>
+
+                </div>
+              </div>
+
+              {/* Détails du projet */}
+              <div className="bg-white border border-gray-200 rounded-2xl p-6">
+                <h2 className={`text-[#052E78] font-bold text-lg mb-6 border-l-4 border-[#052E78] pl-3 ${hanken.className}`}>
+                  Détails du projet
+                </h2>
+                <div className="flex flex-col gap-4">
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className={`text-[#052E78] text-sm font-medium mb-1 block ${inter.className}`}>Type de service *</label>
+                      <select
+                        name="typeService"
+                        value={form.typeService}
+                        onChange={handleChange}
+                        className={`w-full bg-[#E5EEFF] border-none rounded-lg px-4 py-2.5 text-sm text-[#444651] focus:outline-none focus:ring-2 focus:ring-[#052E78] ${inter.className}`}
+                      >
+                        <option>Création de site web</option>
+                        <option>Refonte de site existant</option>
+                        <option>E-commerce</option>
+                        <option>Plateforme spécifique (métier)</option>
+                        <option>Application mobile (Android, iOS)</option>
+                        <option>Marketing digital</option>
+                        <option>SEO / Référencement</option>
+                        <option>Identité visuelle / Branding</option>
+                        <option>Autre</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className={`text-[#052E78] text-sm font-medium mb-1 block ${inter.className}`}>Budget estimatif</label>
+                      <select
+                        name="budget"
+                        value={form.budget}
+                        onChange={handleChange}
+                        className={`w-full bg-[#E5EEFF] border-none rounded-lg px-4 py-2.5 text-sm text-[#444651] focus:outline-none focus:ring-2 focus:ring-[#052E78] ${inter.className}`}
+                      >
+                        <option>Moins de 100 000 DA</option>
+                        <option>100 000 – 200 000 DA</option>
+                        <option>200 000 – 400 000 DA</option>
+                        <option>Plus de 400 000 DA</option>
+                        <option>À définir avec l'agence</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className={`text-[#052E78] text-sm font-medium mb-1 block ${inter.className}`}>Délai souhaité</label>
+                    <select
+                      name="delai"
+                      value={form.delai}
+                      onChange={handleChange}
+                      className={`w-full bg-[#E5EEFF] border-none rounded-lg px-4 py-2.5 text-sm text-[#444651] focus:outline-none focus:ring-2 focus:ring-[#052E78] ${inter.className}`}
+                    >
+                      <option>Urgent (moins d'1 mois)</option>
+                      <option>1-3 mois</option>
+                      <option>Flexible</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className={`text-[#052E78] text-sm font-medium mb-1 block ${inter.className}`}>Description du projet *</label>
+                    <textarea
+                      name="description"
+                      value={form.description}
+                      onChange={handleChange}
+                      rows={5}
+                      placeholder="Décrivez votre projet, vos objectifs, et tout élément qui nous aidera à mieux comprendre votre besoin..."
+                      className={`w-full bg-[#E5EEFF] border-none rounded-lg px-4 py-2.5 text-sm text-[#444651] focus:outline-none focus:ring-2 focus:ring-[#052E78] resize-none ${inter.className}`}
+                    />
+                    {errors.description && <p className="text-red-500 text-xs mt-1">{errors.description}</p>}
+                  </div>
+
+                  <div>
+                    <label className={`flex items-center gap-2 cursor-pointer ${inter.className}`}>
+                      <input
+                        type="checkbox"
+                        checked={cahierDesCharges}
+                        onChange={(e) => setCahierDesCharges(e.target.checked)}
+                        className="w-4 h-4 accent-[#052E78]"
+                      />
+                      <span className={`text-[#444651] text-sm ${inter.className}`}>
+                        Avez-vous déjà un cahier des charges ?
+                      </span>
+                    </label>
+                    {cahierDesCharges && (
+                      <div className="mt-3">
+                        <label className={`block text-[#052E78] text-sm font-medium mb-1 ${inter.className}`}>Joindre votre fichier</label>
+                        <input
+                          type="file"
+                          onChange={(e) => setFichier(e.target.files[0])}
+                          className={`w-full bg-[#E5EEFF] border border-dashed border-[#052E78] rounded-lg px-4 py-3 text-sm text-[#444651] cursor-pointer ${inter.className}`}
+                        />
+                        {fichier && (
+                          <p className={`text-green-500 text-xs mt-1 ${inter.className}`}>✓ {fichier.name}</p>
+                        )}
+                      </div>
+                    )}
+                  </div>
+
+                </div>
+              </div>
+
+         {/* Bouton + réassurance */}
+<div className="flex flex-col gap-3">
+  <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+    <p className={`text-[#444651] text-xs ${inter.className}`}>
+      🔒 Vos informations restent confidentielles. Aucun engagement de votre part.
+    </p>
+    <button
+      onClick={handleSubmit}
+      disabled={loading}
+      className={`bg-[#052E78] text-white px-8 py-2.5 rounded-lg text-sm font-medium hover:bg-[#041f52] transition-all duration-300 hover:scale-105 whitespace-nowrap disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100 ${poppins.className}`}
+    >
+      {loading ? 'Envoi en cours...' : 'Envoyer ma demande'}
+    </button>
   </div>
-  <Link
-    href="/portfolio"
-    className={`block text-center border-2 border-white text-white px-4 py-2 rounded-lg text-xs font-medium hover:bg-white hover:text-[#052E78] transition-colors mt-4 ${poppins.className}`}
-  >
-    Voir nos réalisations
-  </Link>
+
+  {statusMsg && (
+    <p className={`text-sm font-medium ${statusMsg.type === 'success' ? 'text-green-600' : 'text-red-500'} ${inter.className}`}>
+      {statusMsg.text}
+    </p>
+  )}
 </div>
 
-          </div>
+            </div>
 
+            {/* Sidebar droite */}
+            <div className="lg:w-80 flex flex-col gap-6">
+
+              {/* Pourquoi nous */}
+              <div className="bg-white border border-gray-200 rounded-2xl p-6">
+                <h3 className={`text-[#052E78] font-bold text-base mb-4 ${hanken.className}`}>
+                  Pourquoi nous ?
+                </h3>
+                <div className="flex flex-col gap-4">
+                  {[
+                    { icon: <Zap size={16} />, titre: 'Réponse rapide', desc: 'Nous répondons à chaque demande en moins de 48 heures.' },
+                    { icon: <FileText size={16} />, titre: 'Devis 100% personnalisé', desc: 'Pas de pack standard, une solution adaptée à votre budget.' },
+                    { icon: <Users size={16} />, titre: 'Équipe locale & disponible', desc: 'Rencontrez nos experts dans tous les bureaux à Alger.' },
+                  ].map((item, i) => (
+                    <div key={i} className="flex items-start gap-3">
+                      <span className="w-8 h-8 bg-[#E5EEFF] rounded-full flex items-center justify-center text-green-500 flex-shrink-0">
+                        {item.icon}
+                      </span>
+                      <div>
+                        <p className={`text-[#052E78] font-semibold text-sm ${hanken.className}`}>{item.titre}</p>
+                        <p className={`text-[#444651] text-xs ${inter.className}`}>{item.desc}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Besoin d'aide */}
+              <div className="bg-[#052E78] rounded-2xl p-6">
+                <h3 className={`text-white font-bold text-base mb-4 ${hanken.className}`}>
+                  Besoin d'aide ?
+                </h3>
+                <div className="flex flex-col gap-3 mb-4">
+                  {[
+                    { icon: <Phone size={16} />, text: '+213 (0) 23 00 00 00' },
+                    { icon: <MessageCircle size={16} />, text: 'WhatsApp Direct' },
+                    { icon: <Mail size={16} />, text: 'contact@creatic-algerie.com' },
+                  ].map((item, i) => (
+                    <div key={i} className={`flex items-center gap-2 text-white text-sm ${inter.className}`}>
+                      <span className="text-white">{item.icon}</span>
+                      {item.text}
+                    </div>
+                  ))}
+                </div>
+                <Link
+                  href="/portfolio"
+                  className={`block text-center border-2 border-white text-white px-4 py-2 rounded-lg text-xs font-medium hover:bg-white hover:text-[#052E78] transition-colors mt-4 ${poppins.className}`}
+                >
+                  Voir nos réalisations
+                </Link>
+              </div>
+
+            </div>
+
+          </div>
         </div>
       </div>
+
+      {/* FAQ */}
+      <section className="bg-white py-16 sm:py-20">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6">
+          <div className="text-center mb-10">
+            <h2 className={`text-2xl sm:text-3xl font-bold text-[#052E78] mb-2 ${hanken.className}`}>
+              Questions fréquentes
+            </h2>
+            <p className={`text-[#444651] text-sm ${inter.className}`}>
+              Tout ce que vous devez savoir sur notre processus de devis
+            </p>
+          </div>
+          <FAQ hanken={hanken} inter={inter} />
+        </div>
+      </section>
+
     </main>
   );
 }
