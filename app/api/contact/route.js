@@ -7,14 +7,14 @@ export async function POST(request) {
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
+        user: process.env.GMAIL_USER,
+        pass: process.env.GMAIL_APP_PASSWORD,
       },
     });
 
     await transporter.sendMail({
-      from: process.env.EMAIL_USER,
-      to: process.env.CONTACT_EMAIL,
+      from: process.env.GMAIL_USER,
+      to: process.env.GMAIL_TO,
       subject: "Nouveau message depuis le formulaire Contact",
       html: `
         <h2>Nouveau message</h2>
@@ -33,7 +33,6 @@ export async function POST(request) {
       success: true,
       message: "Email envoyé avec succès.",
     });
-
   } catch (error) {
     console.error(error);
 

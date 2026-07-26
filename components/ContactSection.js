@@ -2,7 +2,7 @@
 import { useState } from "react";
 
 import { Inter, Poppins } from "next/font/google";
-
+const whatsappLink = `https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER}?text=Bonjour,%20je%20souhaite%20obtenir%20des%20informations%20sur%20vos%20services.`;
 const inter = Inter({
   subsets: ["latin"],
   weight: ["400", "500"],
@@ -350,11 +350,14 @@ const handleSubmit = async (e) => {
 
     <div className="mt-auto pt-10">
 
-      <button
-        className={`w-full rounded-xl bg-[#052E78] py-4 text-white font-medium transition hover:bg-[#04255f] ${poppins.className}`}
-      >
-        💬 Discuter sur WhatsApp
-      </button>
+     <a
+  href={whatsappLink}
+  target="_blank"
+  rel="noopener noreferrer"
+  className={`block w-full rounded-xl bg-[#052E78] py-4 text-center text-white font-medium transition hover:bg-[#04255f] ${poppins.className}`}
+>
+  💬 Discuter sur WhatsApp
+</a>
 
     </div>
 
