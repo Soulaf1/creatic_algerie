@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useState } from 'react';
+import { usePathname } from 'next/navigation';
 import { Hanken_Grotesk, Poppins } from 'next/font/google';
 
 const hanken = Hanken_Grotesk({
@@ -25,6 +26,7 @@ const links = [
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const pathname = usePathname();
 
   return (
     <nav className="bg-white shadow-sm sticky top-0 z-50">
@@ -50,7 +52,11 @@ export default function Navbar() {
             <li key={item.href}>
               <Link
                 href={item.href}
-                className="text-[#444651] hover:text-[#052E78] hover:underline underline-offset-4 decoration-[#052E78] font-medium transition-all text-base"
+                className={`font-medium transition-all text-base ${
+                  pathname === item.href
+                    ? 'text-[#052E78] underline underline-offset-4 decoration-[#052E78]'
+                    : 'text-[#444651] hover:text-[#052E78] hover:underline underline-offset-4 decoration-[#052E78]'
+                }`}
               >
                 {item.label}
               </Link>
@@ -92,7 +98,11 @@ export default function Navbar() {
               <li key={item.href}>
                 <Link
                   href={item.href}
-                  className="text-[#444651] hover:text-[#052E78] font-medium block py-1"
+                  className={`font-medium block py-1 ${
+                    pathname === item.href
+                      ? 'text-[#052E78] underline underline-offset-4'
+                      : 'text-[#444651] hover:text-[#052E78]'
+                  }`}
                   onClick={() => setMenuOpen(false)}
                 >
                   {item.label}
