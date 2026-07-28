@@ -91,7 +91,7 @@ const handleSubmit = async (e) => {
                  setFormData({ ...formData, name: e.target.value })
                     }
   placeholder="Ex: Mohamed Amine"
-  className={`w-full rounded-lg border border-[#C4C6D3] bg-[#F4F7FF] px-4 py-4 text-[#444651] placeholder:text-[#6B7280] outline-none transition-all duration-300 focus:border-[#274690] focus:ring-2 focus:ring-[#274690]/10 ${inter.className}`}
+  className={`w-full rounded-lg border border-[#C4C6D3] bg-[#E5EEFF] px-4 py-2.5 text-[#444651] placeholder:text-[#6B7280] outline-none transition-all duration-300 focus:border-[#274690] focus:ring-2 focus:ring-[#274690]/10 ${inter.className}`}
 />
 
                 </div>
@@ -107,7 +107,7 @@ const handleSubmit = async (e) => {
                   <input
                     type="email"
                     placeholder="m.amine@entreprise.dz"
-                    className={`w-full rounded-lg border border-[#C4C6D3] bg-[#F4F7FF] px-4 py-4 text-[#444651] placeholder:text-[#6B7280] outline-none transition-all duration-300 focus:border-[#274690] focus:ring-2 focus:ring-[#274690]/10 ${inter.className}`}
+                    className={`w-full rounded-lg border border-[#C4C6D3] bg-[#E5EEFF] px-4 py-2.5 text-[#444651] placeholder:text-[#6B7280] outline-none transition-all duration-300 focus:border-[#274690] focus:ring-2 focus:ring-[#274690]/10 ${inter.className}`}
                     name="email"
                     value={formData.email}
                     onChange={(e) =>
@@ -132,7 +132,7 @@ const handleSubmit = async (e) => {
                 <input
                   type="text"
                   placeholder="+213 (0) ..."
-                  className={`w-full rounded-lg border border-[#C4C6D3] bg-[#F4F7FF] px-4 py-4 text-[#444651] placeholder:text-[#6B7280] outline-none transition-all duration-300 focus:border-[#274690] focus:ring-2 focus:ring-[#274690]/10 ${inter.className}`}
+                  className={`w-full rounded-lg border border-[#C4C6D3] bg-[#E5EEFF] px-4 py-2.5 text-[#444651] placeholder:text-[#6B7280] outline-none transition-all duration-300 focus:border-[#274690] focus:ring-2 focus:ring-[#274690]/10 ${inter.className}`}
                name="phone"
                 value={formData.phone}
                 onChange={(e) =>
@@ -155,7 +155,7 @@ const handleSubmit = async (e) => {
                 <textarea
                   rows={4}
                   placeholder="Dites-nous en plus sur vos objectifs et vos besoins techniques..."
-                  className={`w-full resize-none rounded-lg border border-[#C4C6D3] bg-[#F4F7FF] px-4 py-4 text-[#444651] placeholder:text-[#6B7280] outline-none transition-all duration-300 focus:border-[#274690] focus:ring-2 focus:ring-[#274690]/10 ${inter.className}`}
+                  className={`w-full resize-none rounded-lg border border-[#C4C6D3] bg-[#E5EEFF] px-4 py-2.5 text-[#444651] placeholder:text-[#6B7280] outline-none transition-all duration-300 focus:border-[#274690] focus:ring-2 focus:ring-[#274690]/10 ${inter.className}`}
                   name="message"
                   value={formData.message}
                   onChange={(e) =>
@@ -169,7 +169,7 @@ const handleSubmit = async (e) => {
              <button
   type="submit"
   disabled={loading}
-  className={`inline-flex items-center gap-3 rounded-xl bg-[#052E78] px-8 py-4 text-white font-medium transition-all duration-300 hover:bg-[#041f52] hover:scale-[1.02] disabled:opacity-60 disabled:cursor-not-allowed ${poppins.className}`}
+className={`inline-flex items-center gap-3 rounded-xl bg-[#052E78] px-6 py-2.5 text-sm text-white font-medium transition-all duration-300 hover:bg-[#041f52] hover:scale-[1.02] disabled:opacity-60 disabled:cursor-not-allowed ${poppins.className}`}
 >
   {loading ? "Envoi..." : "Envoyer le message"}
 
@@ -204,7 +204,7 @@ const handleSubmit = async (e) => {
 
 <div className="px-10 pt-8 pb-8 flex flex-col">
     <h2
-      className={`text-white text-4xl font-semibold mb-10 ${poppins.className}`}
+     className={`text-white text-xl font-semibold mb-6 ${poppins.className}`}
     >
       Coordonnées
     </h2>
@@ -235,14 +235,12 @@ const handleSubmit = async (e) => {
       <div>
 
         <p
-          className={`text-[#A0B8FF] text-sm mb-1 ${inter.className}`}
-        >
+className={`text-[#A0B8FF] text-xs mb-1 ${inter.className}`}        >
           Appelez-nous
         </p>
 
         <h3
-          className={`text-white text-2xl font-semibold leading-tight ${poppins.className}`}
-        >
+className={`text-white text-base font-semibold leading-tight ${poppins.className}`}        >
           +213 (0) 550 00 00 00
         </h3>
 
@@ -281,14 +279,12 @@ const handleSubmit = async (e) => {
       <div>
 
         <p
-          className={`text-[#A0B8FF] text-sm mb-1 ${inter.className}`}
-        >
+className={`text-[#A0B8FF] text-xs mb-1 ${inter.className}`}        >
           E-mail
         </p>
 
         <h3
-          className={`text-white text-[2rem] leading-tight font-semibold break-words ${poppins.className}`}
-        >
+className={`text-white text-base font-semibold break-words ${poppins.className}`}        >
           contact@creatic-
           <br />
           algerie.dz
@@ -329,13 +325,13 @@ const handleSubmit = async (e) => {
       <div>
 
         <p
-          className={`text-[#A0B8FF] text-sm mb-1 ${inter.className}`}
+className={`text-[#A0B8FF] text-xs mb-1 ${inter.className}`}
         >
           Bureau
         </p>
 
         <h3
-          className={`text-white text-2xl font-semibold leading-tight ${poppins.className}`}
+className={`text-white text-base font-semibold leading-tight ${poppins.className}`}
         >
           Hydra, Alger,
           <br />
@@ -354,7 +350,7 @@ const handleSubmit = async (e) => {
   href={whatsappLink}
   target="_blank"
   rel="noopener noreferrer"
-  className={`block w-full rounded-xl bg-[#052E78] py-4 text-center text-white font-medium transition hover:bg-[#04255f] ${poppins.className}`}
+className={`block w-full rounded-xl bg-[#052E78] py-2.5 text-center text-sm text-white font-medium transition hover:bg-[#041f52] ${poppins.className}`}
 >
   💬 Discuter sur WhatsApp
 </a>
