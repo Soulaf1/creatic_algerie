@@ -9,8 +9,12 @@
     "lint": "eslint"
   },
   "dependencies": {
-    "mongoose": "^9.7.4",
+    "bcryptjs": "^3.0.3",
+    "dotenv": "^17.4.2",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^9.8.1",
     "next": "16.2.10",
+    "prompts": "^2.4.2",
     "react": "19.2.4",
     "react-dom": "19.2.4"
   },
