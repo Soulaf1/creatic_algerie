@@ -77,14 +77,15 @@ response.cookies.set("admin_token", token, {
 
 return response;
   } catch (error) {
-    console.error(error);
+  console.error("LOGIN ERROR");
+  console.error(error);
 
-    return NextResponse.json(
-      {
-        success: false,
-        message: "Erreur serveur.",
-      },
-      { status: 500 }
-    );
-  }
+  return NextResponse.json(
+    {
+      success: false,
+      message: error.message,
+    },
+    { status: 500 }
+  );
+}
 }

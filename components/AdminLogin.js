@@ -49,8 +49,8 @@ export default function LoginPage() {
       return;
     }
 
-    alert("Connexion réussie !");
-    //router.push("/admin/dashboard");/////////////////////////////////////
+    //alert("Connexion réussie !");
+    router.push("/admin/dashboard");
   } catch (error) {
     setError("Une erreur est survenue.");
   } finally {
