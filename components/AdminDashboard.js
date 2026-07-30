@@ -22,30 +22,30 @@ export default function AdminDashboard() {
   const [projects, setProjects] = useState([]);
   const [testimonials, setTestimonials] = useState([]);
 
-  useEffect(() => {
-    async function loadDashboardData() {
-      try {
-        const [projectsResponse, testimonialsResponse] = await Promise.all([
-          fetch("/api/portfolio"),
-          fetch("/api/temoignages"),
-        ]);
+ useEffect(() => {
+  async function loadDashboardData() {
+    try {
+      const projectsResponse = await fetch("/api/admin/portfolio");
 
-        const projectsData = await projectsResponse.json();
-        const testimonialsData = await testimonialsResponse.json();
-
-        setProjects(Array.isArray(projectsData) ? projectsData : []);
-        setTestimonials(
-          Array.isArray(testimonialsData) ? testimonialsData : []
-        );
-      } catch (error) {
-        console.error("Erreur chargement dashboard :", error);
-        setProjects([]);
-        setTestimonials([]);
+      if (!projectsResponse.ok) {
+        throw new Error("Impossible de charger les projets.");
       }
-    }
 
-    loadDashboardData();
-  }, []);
+      const projectsData = await projectsResponse.json();
+
+      setProjects(Array.isArray(projectsData) ? projectsData : []);
+
+      // Testimonials API will be added next
+      setTestimonials([]);
+    } catch (error) {
+      console.error("Erreur chargement dashboard :", error);
+      setProjects([]);
+      setTestimonials([]);
+    }
+  }
+
+  loadDashboardData();
+}, []);
 
   return (
     <div className="flex min-h-screen bg-[#E5EEFF]">
@@ -93,7 +93,7 @@ export default function AdminDashboard() {
                         <div className="w-14 h-14 rounded-lg overflow-hidden bg-[#E5EEFF] shrink-0">
                           {project.image ? (
                             <img
-                              src={project.image}
+                              src={project.image?.startsWith("/") ? project.image : `/${project.image}`}
                               alt={project.titre || "Projet"}
                               className="w-full h-full object-cover"
                             />
