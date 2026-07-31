@@ -7,7 +7,7 @@ import { Hanken_Grotesk, Inter } from "next/font/google";
 import Sidebar from "./Sidebar";
 import AdminHeader from "./AdminHeader";
 import StatsCards from "./StatsCards";
-
+import { useSearchParams } from "next/navigation";
 const hanken = Hanken_Grotesk({
   subsets: ["latin"],
   weight: ["500", "600", "700"],
@@ -22,21 +22,25 @@ export default function AdminDashboard() {
   const [projects, setProjects] = useState([]);
   const [testimonials, setTestimonials] = useState([]);
 
- useEffect(() => {
+useEffect(() => {
   async function loadDashboardData() {
     try {
-      const projectsResponse = await fetch("/api/admin/portfolio");
+      const [projectsResponse, testimonialsResponse] = await Promise.all([
+        fetch("/api/admin/portfolio"),
+        fetch("/api/admin/temoignages"),
+      ]);
 
-      if (!projectsResponse.ok) {
-        throw new Error("Impossible de charger les projets.");
+      if (!projectsResponse.ok || !testimonialsResponse.ok) {
+        throw new Error("Impossible de charger les données.");
       }
 
       const projectsData = await projectsResponse.json();
+      const testimonialsData = await testimonialsResponse.json();
 
       setProjects(Array.isArray(projectsData) ? projectsData : []);
-
-      // Testimonials API will be added next
-      setTestimonials([]);
+      setTestimonials(
+        Array.isArray(testimonialsData) ? testimonialsData : []
+      );
     } catch (error) {
       console.error("Erreur chargement dashboard :", error);
       setProjects([]);

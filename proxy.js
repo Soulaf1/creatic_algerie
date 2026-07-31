@@ -4,7 +4,7 @@ import jwt from "jsonwebtoken";
 export function proxy(request) {
   const token = request.cookies.get("admin_token")?.value;
 
-  // Si connecté et tente d'aller sur /admin/login
+  // Déjà connecté → empêcher le retour vers le login
   if (
     request.nextUrl.pathname === "/admin/login" &&
     token
@@ -14,7 +14,7 @@ export function proxy(request) {
     );
   }
 
-  // Si non connecté et va sur /admin/login
+  // Pas connecté → autoriser uniquement la page login
   if (
     request.nextUrl.pathname === "/admin/login" &&
     !token
@@ -22,7 +22,7 @@ export function proxy(request) {
     return NextResponse.next();
   }
 
-  // Toutes les autres pages admin nécessitent un token
+  // Toutes les autres routes admin nécessitent un token
   if (!token) {
     return NextResponse.redirect(
       new URL("/admin/login", request.url)
@@ -31,6 +31,7 @@ export function proxy(request) {
 
   try {
     jwt.verify(token, process.env.JWT_SECRET);
+
     return NextResponse.next();
   } catch {
     return NextResponse.redirect(

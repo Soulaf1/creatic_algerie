@@ -7,6 +7,7 @@ import {
   LayoutDashboard,
   Briefcase,
   MessageSquare,
+  Settings,
   LogOut,
 } from "lucide-react";
 
@@ -22,44 +23,53 @@ const inter = Inter({
   weight: ["400", "500"],
 });
 
+const links = [
+  {
+    title: "Dashboard",
+    href: "/admin/dashboard",
+    icon: LayoutDashboard,
+  },
+  {
+    title: "Portfolio",
+    href: "/admin/portfolio",
+    icon: Briefcase,
+  },
+  {
+    title: "Témoignages",
+    href: "/admin/temoignages",
+    icon: MessageSquare,
+  },
+  {
+    title: "Paramètres",
+    href: "/admin/settings",
+    icon: Settings,
+  },
+];
+
 export default function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
 
   async function handleLogout() {
-    await fetch("/api/admin/logout", {
-      method: "POST",
-    });
+    try {
+      await fetch("/api/admin/logout", {
+        method: "POST",
+      });
 
-    router.push("/admin/login");
-    router.refresh();
+      router.replace("/admin/login");
+      router.refresh();
+    } catch (error) {
+      console.error("Erreur lors de la déconnexion :", error);
+    }
   }
 
-  const links = [
-    {
-      title: "Dashboard",
-      href: "/admin/dashboard",
-      icon: LayoutDashboard,
-    },
-    {
-      title: "Portfolio",
-      href: "/admin/portfolio",
-      icon: Briefcase,
-    },
-    {
-      title: "Témoignages",
-      href: "/admin/temoignages",
-      icon: MessageSquare,
-    },
-  ];
-
   return (
-    <aside className="fixed left-0 top-0 h-screen w-64 bg-[#052E78] flex flex-col">
-
+    <aside className="fixed left-0 top-0 flex h-screen w-64 flex-col bg-[#052E78]">
+      
       {/* Logo */}
-      <div className="px-6 py-6 border-b border-white/10">
+      <div className="border-b border-white/10 px-6 py-6">
         <h1
-          className={`text-white text-xl font-bold ${hanken.className}`}
+          className={`text-xl font-bold text-white ${hanken.className}`}
         >
           CREATIC-ALGERIE
         </h1>
@@ -67,69 +77,76 @@ export default function Sidebar() {
 
       {/* Navigation */}
       <nav className="flex-1 px-4 py-6">
-  <Link
-    href="/admin/dashboard"
-    className="flex items-center gap-3 rounded-lg bg-green-500 px-4 py-3 text-white"
-  >
-    Dashboard
-  </Link>
+        <div className="flex flex-col gap-2">
 
-  <Link
-    href="/admin/portfolio"
-    className="mt-3 flex items-center gap-3 rounded-lg bg-white/10 px-4 py-3 text-white"
-  >
-    Portfolio
-  </Link>
+          {links.map((link) => {
+            const Icon = link.icon;
 
-  <Link
-    href="/admin/temoignages"
-    className="mt-3 flex items-center gap-3 rounded-lg bg-white/10 px-4 py-3 text-white"
-  >
-    Témoignages
-  </Link>
-</nav>
+            const active =
+              link.href === "/admin/dashboard"
+                ? pathname === "/admin/dashboard"
+                : pathname.startsWith(link.href);
+
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={`
+                  flex items-center gap-3
+                  rounded-lg
+                  px-4 py-3
+                  transition-all
+                  ${
+                    active
+                      ? "bg-[#22C55E] text-white"
+                      : "text-white/70 hover:bg-white/10 hover:text-white"
+                  }
+                  ${inter.className}
+                `}
+              >
+                <Icon size={18} />
+                <span>{link.title}</span>
+              </Link>
+            );
+          })}
+
+        </div>
+      </nav>
 
       {/* Déconnexion */}
       <div className="border-t border-white/10 px-4 py-5">
-
         <button
           onClick={handleLogout}
-          className={`flex items-center gap-3 text-red-400 hover:text-red-300 transition ${inter.className}`}
+          className={`flex items-center gap-3 text-red-400 transition hover:text-red-300 ${inter.className}`}
         >
           <LogOut size={18} />
-
           Déconnexion
         </button>
-
       </div>
 
       {/* Profil */}
       <div className="border-t border-white/10 px-4 py-5">
-
         <div className="flex items-center gap-3">
 
-          <div className="h-10 w-10 rounded-full bg-[#22C55E] flex items-center justify-center text-white font-bold">
+          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#22C55E] font-bold text-white">
             AC
           </div>
 
           <div>
-
             <p
-              className={`text-white font-semibold text-sm ${hanken.className}`}
+              className={`text-sm font-semibold text-white ${hanken.className}`}
             >
               Admin Creatic
             </p>
 
             <p
-              className={`text-white/60 text-xs ${inter.className}`}
+              className={`text-xs text-white/60 ${inter.className}`}
             >
               Super Administrateur
             </p>
-
           </div>
 
         </div>
-
       </div>
 
     </aside>

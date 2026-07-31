@@ -1,13 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
-import Link from "next/link";
 import { Hanken_Grotesk, Inter } from "next/font/google";
 
 import Sidebar from "./Sidebar";
 import AdminHeader from "./AdminHeader";
-import PortfolioForm from "./PortfolioForm";
+import TemoignageForm from "./TemoignageForm";
 
 const hanken = Hanken_Grotesk({
   subsets: ["latin"],
@@ -19,78 +17,98 @@ const inter = Inter({
   weight: ["400", "500"],
 });
 
-export default function AdminPortfolio() {
-  const [projects, setProjects] = useState([]);
-  const [loading, setLoading] = useState(true);
+function getInitials(name = "") {
+  return (
+    name
+      .split(" ")
+      .filter(Boolean)
+      .map((part) => part[0])
+      .join("")
+      .slice(0, 2)
+      .toUpperCase() || "AC"
+  );
+}
 
-  // null = tableau
-  // "create" = création
-  // objet = modification
-  const [editingProject, setEditingProject] = useState(null);
+function getAvatarColor(index) {
+  const colors = [
+    "bg-[#274690]",
+    "bg-[#9EF5BC]",
+    "bg-[#DCE6FF]",
+  ];
+
+  return colors[index % colors.length];
+}
+
+export default function AdminTemoignages() {
+  const [testimonials, setTestimonials] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
-  const searchParams = useSearchParams();
-  async function loadProjects() {
+  const [editingTestimonial, setEditingTestimonial] = useState(null);
+
+  async function loadTestimonials() {
     try {
       setLoading(true);
 
-      const response = await fetch("/api/admin/portfolio");
+      const response = await fetch("/api/admin/temoignages");
 
       if (!response.ok) {
-        throw new Error("Impossible de récupérer les projets.");
+        throw new Error("Impossible de récupérer les témoignages.");
       }
 
       const data = await response.json();
 
-      setProjects(Array.isArray(data) ? data : []);
+      setTestimonials(Array.isArray(data) ? data : []);
     } catch (error) {
-      console.error("Erreur Portfolio :", error);
-      setProjects([]);
+      console.error("Erreur témoignages :", error);
+      setTestimonials([]);
     } finally {
       setLoading(false);
     }
   }
 
   useEffect(() => {
-    loadProjects();
+    loadTestimonials();
   }, []);
 
   function handleCreate() {
-    setEditingProject(null);
+    setEditingTestimonial(null);
     setShowForm(true);
   }
 
-  function handleEdit(project) {
-    setEditingProject(project);
+  function handleEdit(testimonial) {
+    setEditingTestimonial(testimonial);
     setShowForm(true);
-  }
-
-  function handleFormSuccess(savedProject) {
-    setShowForm(false);
-    setEditingProject(null);
-
-    setProjects((current) => {
-      const exists = current.some(
-        (project) => project._id === savedProject._id
-      );
-
-      if (exists) {
-        return current.map((project) =>
-          project._id === savedProject._id ? savedProject : project
-        );
-      }
-
-      return [savedProject, ...current];
-    });
   }
 
   function handleCancel() {
     setShowForm(false);
-    setEditingProject(null);
+    setEditingTestimonial(null);
+  }
+
+  function handleFormSuccess(savedTestimonial) {
+    setShowForm(false);
+    setEditingTestimonial(null);
+
+    setTestimonials((current) => {
+      const exists = current.some(
+        (item) => item._id === savedTestimonial._id
+      );
+
+      if (exists) {
+        return current.map((item) =>
+          item._id === savedTestimonial._id
+            ? savedTestimonial
+            : item
+        );
+      }
+
+      return [savedTestimonial, ...current];
+    });
   }
 
   async function handleDelete(id) {
     const confirmed = window.confirm(
-      "Voulez-vous vraiment supprimer ce projet ?"
+      "Voulez-vous vraiment supprimer ce témoignage ?"
     );
 
     if (!confirmed) {
@@ -98,21 +116,26 @@ export default function AdminPortfolio() {
     }
 
     try {
-      const response = await fetch(`/api/admin/portfolio/${id}`, {
-        method: "DELETE",
-      });
+      const response = await fetch(
+        `/api/admin/temoignages/${id}`,
+        {
+          method: "DELETE",
+        }
+      );
 
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || "Erreur lors de la suppression.");
+        throw new Error(
+          data.error || "Erreur lors de la suppression."
+        );
       }
 
-      setProjects((current) =>
-        current.filter((project) => project._id !== id)
+      setTestimonials((current) =>
+        current.filter((item) => item._id !== id)
       );
     } catch (error) {
-      console.error("Erreur suppression :", error);
+      console.error("Erreur suppression témoignage :", error);
       alert(error.message);
     }
   }
@@ -122,30 +145,30 @@ export default function AdminPortfolio() {
       <Sidebar />
 
       <main className="flex-1 ml-64">
-        <AdminHeader title="Gestion du Portfolio" />
+        <AdminHeader title="Gestion des Témoignages" />
 
         <div className="p-8">
           {showForm ? (
-            <PortfolioForm
-              project={editingProject}
+            <TemoignageForm
+              testimonial={editingTestimonial}
               onSuccess={handleFormSuccess}
               onCancel={handleCancel}
             />
           ) : (
             <>
-              {/* En-tête */}
+              {/* Header */}
               <div className="flex items-center justify-between mb-6">
                 <div>
                   <h2
                     className={`text-xl font-bold text-[#052E78] ${hanken.className}`}
                   >
-                    Projets réalisés
+                    Témoignages clients
                   </h2>
 
                   <p
                     className={`text-sm text-[#444651] mt-1 ${inter.className}`}
                   >
-                    Gérez les projets affichés sur votre site.
+                    Gérez les témoignages affichés sur votre site.
                   </p>
                 </div>
 
@@ -153,7 +176,7 @@ export default function AdminPortfolio() {
                   onClick={handleCreate}
                   className={`bg-[#22C55E] text-white px-5 py-3 rounded-lg font-medium hover:bg-[#1fb454] transition ${inter.className}`}
                 >
-                  + Ajouter un projet
+                  + Ajouter un témoignage
                 </button>
               </div>
 
@@ -164,22 +187,22 @@ export default function AdminPortfolio() {
                     <p
                       className={`text-[#444651] ${inter.className}`}
                     >
-                      Chargement des projets...
+                      Chargement des témoignages...
                     </p>
                   </div>
-                ) : projects.length === 0 ? (
+                ) : testimonials.length === 0 ? (
                   <div className="p-8 text-center">
                     <p
                       className={`text-[#444651] mb-4 ${inter.className}`}
                     >
-                      Aucun projet pour le moment.
+                      Aucun témoignage pour le moment.
                     </p>
 
                     <button
                       onClick={handleCreate}
                       className={`bg-[#22C55E] text-white px-5 py-2.5 rounded-lg ${inter.className}`}
                     >
-                      Ajouter votre premier projet
+                      Ajouter votre premier témoignage
                     </button>
                   </div>
                 ) : (
@@ -190,19 +213,25 @@ export default function AdminPortfolio() {
                           <th
                             className={`text-left px-6 py-4 text-sm font-semibold text-[#052E78] ${inter.className}`}
                           >
-                            Image
+                            Avatar
                           </th>
 
                           <th
                             className={`text-left px-6 py-4 text-sm font-semibold text-[#052E78] ${inter.className}`}
                           >
-                            Titre
+                            Nom
                           </th>
 
                           <th
                             className={`text-left px-6 py-4 text-sm font-semibold text-[#052E78] ${inter.className}`}
                           >
-                            Catégorie
+                            Entreprise / Poste
+                          </th>
+
+                          <th
+                            className={`text-left px-6 py-4 text-sm font-semibold text-[#052E78] ${inter.className}`}
+                          >
+                            Étoiles
                           </th>
 
                           <th
@@ -220,44 +249,60 @@ export default function AdminPortfolio() {
                       </thead>
 
                       <tbody>
-                        {projects.map((project) => (
+                        {testimonials.map((testimonial, index) => (
                           <tr
-                            key={project._id}
+                            key={testimonial._id}
                             className="border-t border-gray-100 hover:bg-[#F8FAFF] transition"
                           >
-                            {/* Image */}
+                            {/* Avatar */}
                             <td className="px-6 py-4">
-                              <div className="w-14 h-12 rounded-lg overflow-hidden bg-[#E5EEFF]">
-                                {project.image ? (
-                                  <img
-                                    src={
-                                      project.image.startsWith("/")
-                                        ? project.image
-                                        : `/${project.image}`
-                                    }
-                                    alt={project.titre}
-                                    className="w-full h-full object-cover"
-                                  />
-                                ) : null}
+                              <div
+                                className={`w-9 h-9 rounded-lg flex items-center justify-center text-xs font-bold ${
+                                  getAvatarColor(index)
+                                } ${
+                                  index === 1
+                                    ? "text-[#052E78]"
+                                    : "text-white"
+                                }`}
+                              >
+                                {getInitials(testimonial.nom)}
                               </div>
                             </td>
 
-                            {/* Titre */}
+                            {/* Nom */}
                             <td className="px-6 py-4">
                               <p
                                 className={`text-sm font-semibold text-[#052E78] ${hanken.className}`}
                               >
-                                {project.titre}
+                                {testimonial.nom}
                               </p>
                             </td>
 
-                            {/* Catégorie */}
+                            {/* Entreprise */}
                             <td className="px-6 py-4">
-                              <span
-                                className={`inline-flex rounded-full bg-[#E7F9EE] text-[#22C55E] px-3 py-1 text-xs font-medium ${inter.className}`}
+                              <p
+                                className={`text-sm text-[#444651] max-w-[220px] ${inter.className}`}
                               >
-                                {project.categorie}
-                              </span>
+                                {testimonial.entreprise}
+                              </p>
+                            </td>
+
+                            {/* Etoiles */}
+                            <td className="px-6 py-4">
+                              <div className="flex items-center gap-0.5">
+                                {[1, 2, 3, 4, 5].map((star) => (
+                                  <span
+                                    key={star}
+                                    className={
+                                      star <= testimonial.etoiles
+                                        ? "text-[#FFB800]"
+                                        : "text-gray-300"
+                                    }
+                                  >
+                                    ★
+                                  </span>
+                                ))}
+                              </div>
                             </td>
 
                             {/* Date */}
@@ -265,9 +310,9 @@ export default function AdminPortfolio() {
                               <span
                                 className={`text-sm text-[#444651] ${inter.className}`}
                               >
-                                {project.createdAt
+                                {testimonial.createdAt
                                   ? new Date(
-                                      project.createdAt
+                                      testimonial.createdAt
                                     ).toLocaleDateString("fr-FR", {
                                       day: "2-digit",
                                       month: "short",
@@ -279,9 +324,11 @@ export default function AdminPortfolio() {
 
                             {/* Actions */}
                             <td className="px-6 py-4">
-                              <div className="flex items-center justify-end gap-2">
+                              <div className="flex justify-end gap-2">
                                 <button
-                                  onClick={() => handleEdit(project)}
+                                  onClick={() =>
+                                    handleEdit(testimonial)
+                                  }
                                   className={`border border-[#052E78] text-[#052E78] px-3 py-1.5 rounded-md text-xs hover:bg-[#E5EEFF] transition ${inter.className}`}
                                 >
                                   Modifier
@@ -289,7 +336,9 @@ export default function AdminPortfolio() {
 
                                 <button
                                   onClick={() =>
-                                    handleDelete(project._id)
+                                    handleDelete(
+                                      testimonial._id
+                                    )
                                   }
                                   className={`border border-red-500 text-red-500 px-3 py-1.5 rounded-md text-xs hover:bg-red-50 transition ${inter.className}`}
                                 >
