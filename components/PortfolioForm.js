@@ -18,7 +18,6 @@ const initialForm = {
   problematique: "",
   solution: "",
   resultat: "",
-  image: "",
   categorie: "",
 };
 
@@ -28,6 +27,8 @@ export default function PortfolioForm({
   onCancel,
 }) {
   const [form, setForm] = useState(initialForm);
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -40,11 +41,15 @@ export default function PortfolioForm({
         problematique: project.problematique || "",
         solution: project.solution || "",
         resultat: project.resultat || "",
-        image: project.image || "",
         categorie: project.categorie || "",
       });
+
+      setImageFile(null);
+      setImagePreview(project.image || "");
     } else {
       setForm(initialForm);
+      setImageFile(null);
+      setImagePreview("");
     }
 
     setError("");
@@ -59,12 +64,48 @@ export default function PortfolioForm({
     }));
   }
 
+  function handleImageChange(e) {
+    const file = e.target.files?.[0];
+
+    if (!file) {
+      return;
+    }
+
+    if (!file.type.startsWith("image/")) {
+      setError("Veuillez sélectionner une image.");
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      setError("L'image ne doit pas dépasser 5 Mo.");
+      return;
+    }
+
+    setError("");
+    setImageFile(file);
+
+    const previewUrl = URL.createObjectURL(file);
+    setImagePreview(previewUrl);
+  }
+
   async function handleSubmit(e) {
     e.preventDefault();
     setError("");
     setLoading(true);
 
     try {
+      const formData = new FormData();
+
+      formData.append("titre", form.titre);
+      formData.append("problematique", form.problematique);
+      formData.append("solution", form.solution);
+      formData.append("resultat", form.resultat);
+      formData.append("categorie", form.categorie);
+
+      if (imageFile) {
+        formData.append("image", imageFile);
+      }
+
       const url = isEditing
         ? `/api/admin/portfolio/${project._id}`
         : "/api/admin/portfolio";
@@ -73,10 +114,7 @@ export default function PortfolioForm({
 
       const response = await fetch(url, {
         method,
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(form),
+        body: formData,
       });
 
       const data = await response.json();
@@ -117,7 +155,7 @@ export default function PortfolioForm({
 
       {error && (
         <div
-          className={`mb-5 rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-600 ${inter.className}`}
+          className={`mb-5 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600 ${inter.className}`}
         >
           {error}
         </div>
@@ -138,8 +176,8 @@ export default function PortfolioForm({
             value={form.titre}
             onChange={handleChange}
             required
-            className={`w-full rounded-lg border border-[#C5D4F0] bg-white px-4 py-3 text-[#444651] outline-none focus:border-[#052E78] ${inter.className}`}
             placeholder="Ex. DzPay"
+            className={`w-full rounded-lg border border-[#C5D4F0] bg-white px-4 py-3 text-[#444651] outline-none focus:border-[#052E78] ${inter.className}`}
           />
         </div>
 
@@ -157,8 +195,8 @@ export default function PortfolioForm({
             value={form.categorie}
             onChange={handleChange}
             required
-            className={`w-full rounded-lg border border-[#C5D4F0] bg-white px-4 py-3 text-[#444651] outline-none focus:border-[#052E78] ${inter.className}`}
             placeholder="Ex. Application mobile"
+            className={`w-full rounded-lg border border-[#C5D4F0] bg-white px-4 py-3 text-[#444651] outline-none focus:border-[#052E78] ${inter.className}`}
           />
         </div>
 
@@ -167,23 +205,38 @@ export default function PortfolioForm({
           <label
             className={`block text-sm font-medium text-[#052E78] mb-2 ${inter.className}`}
           >
-            Image
+            Image du projet
           </label>
 
           <input
-            type="text"
-            name="image"
-            value={form.image}
-            onChange={handleChange}
-            required
-            className={`w-full rounded-lg border border-[#C5D4F0] bg-white px-4 py-3 text-[#444651] outline-none focus:border-[#052E78] ${inter.className}`}
-            placeholder="/dzpay.png"
+            type="file"
+            accept="image/png,image/jpeg,image/webp,image/gif"
+            onChange={handleImageChange}
+            required={!isEditing}
+            className={`w-full rounded-lg border border-[#C5D4F0] bg-white px-4 py-3 text-sm text-[#444651] file:mr-4 file:rounded-md file:border-0 file:bg-[#E5EEFF] file:px-4 file:py-2 file:text-[#052E78] ${inter.className}`}
           />
 
           <p className={`mt-1 text-xs text-[#777] ${inter.className}`}>
-            Pour l'instant, indique le chemin de l'image située dans
-            <code className="ml-1">public/</code>.
+            JPG, PNG, WEBP ou GIF — 5 Mo maximum.
           </p>
+
+          {imagePreview && (
+            <div className="mt-4">
+              <p
+                className={`mb-2 text-xs font-medium text-[#052E78] ${inter.className}`}
+              >
+                Aperçu
+              </p>
+
+              <div className="h-40 w-full max-w-sm overflow-hidden rounded-xl bg-[#E5EEFF]">
+                <img
+                  src={imagePreview}
+                  alt="Aperçu du projet"
+                  className="h-full w-full object-cover"
+                />
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Problématique */}
@@ -200,8 +253,8 @@ export default function PortfolioForm({
             onChange={handleChange}
             required
             rows={4}
-            className={`w-full resize-none rounded-lg border border-[#C5D4F0] bg-white px-4 py-3 text-[#444651] outline-none focus:border-[#052E78] ${inter.className}`}
             placeholder="Quel problème devait être résolu ?"
+            className={`w-full resize-none rounded-lg border border-[#C5D4F0] bg-white px-4 py-3 text-[#444651] outline-none focus:border-[#052E78] ${inter.className}`}
           />
         </div>
 
@@ -219,8 +272,8 @@ export default function PortfolioForm({
             onChange={handleChange}
             required
             rows={4}
-            className={`w-full resize-none rounded-lg border border-[#C5D4F0] bg-white px-4 py-3 text-[#444651] outline-none focus:border-[#052E78] ${inter.className}`}
             placeholder="Quelle solution avez-vous proposée ?"
+            className={`w-full resize-none rounded-lg border border-[#C5D4F0] bg-white px-4 py-3 text-[#444651] outline-none focus:border-[#052E78] ${inter.className}`}
           />
         </div>
 
@@ -238,8 +291,8 @@ export default function PortfolioForm({
             onChange={handleChange}
             required
             rows={4}
-            className={`w-full resize-none rounded-lg border border-[#C5D4F0] bg-white px-4 py-3 text-[#444651] outline-none focus:border-[#052E78] ${inter.className}`}
             placeholder="Quel a été le résultat obtenu ?"
+            className={`w-full resize-none rounded-lg border border-[#C5D4F0] bg-white px-4 py-3 text-[#444651] outline-none focus:border-[#052E78] ${inter.className}`}
           />
         </div>
 
@@ -249,7 +302,7 @@ export default function PortfolioForm({
             type="button"
             onClick={onCancel}
             disabled={loading}
-            className={`rounded-lg border border-[#C5D4F0] px-5 py-2.5 text-[#052E78] hover:bg-[#E5EEFF] transition ${inter.className}`}
+            className={`rounded-lg border border-[#C5D4F0] px-5 py-2.5 text-[#052E78] transition hover:bg-[#E5EEFF] ${inter.className}`}
           >
             Annuler
           </button>
@@ -257,7 +310,7 @@ export default function PortfolioForm({
           <button
             type="submit"
             disabled={loading}
-            className={`rounded-lg bg-[#22C55E] px-5 py-2.5 font-medium text-white hover:bg-[#1fb454] transition disabled:opacity-60 ${inter.className}`}
+            className={`rounded-lg bg-[#22C55E] px-5 py-2.5 font-medium text-white transition hover:bg-[#1fb454] disabled:opacity-60 ${inter.className}`}
           >
             {loading
               ? "Enregistrement..."
