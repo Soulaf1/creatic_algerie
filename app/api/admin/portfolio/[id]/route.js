@@ -2,6 +2,9 @@ import { NextResponse } from "next/server";
 import dbConnect from "@/lib/db";
 import Portfolio from "@/models/Portfolio";
 import { verifyAdmin } from "@/lib/verifyAdmin";
+import { writeFile, unlink } from "fs/promises";
+import path from "path";
+import { randomUUID } from "crypto";
 
 export async function PUT(request, { params }) {
   try {
@@ -9,22 +12,52 @@ export async function PUT(request, { params }) {
     await dbConnect();
 
     const { id } = await params;
-    const body = await request.json();
+    const formData = await request.formData();
 
-    const projet = await Portfolio.findByIdAndUpdate(
-      id,
-      body,
-      {
-        new: true,
-        runValidators: true,
+    const titre = formData.get("titre");
+    const categorie = formData.get("categorie");
+    const problematique = formData.get("problematique");
+    const solution = formData.get("solution");
+    const resultat = formData.get("resultat");
+    const file = formData.get("image");
+
+    const updateData = {
+      titre,
+      categorie,
+      problematique,
+      solution,
+      resultat,
+    };
+
+    // Si une nouvelle image a été envoyée (pas juste un texte vide)
+    if (file && typeof file !== "string") {
+      const extension = path.extname(file.name);
+      const fileName = `${randomUUID()}${extension}`;
+      const uploadDir = path.join(process.cwd(), "public", "uploads", "portfolio");
+      const filePath = path.join(uploadDir, fileName);
+
+      const bytes = await file.arrayBuffer();
+      const buffer = Buffer.from(bytes);
+
+      await writeFile(filePath, buffer);
+
+      updateData.image = `/uploads/portfolio/${fileName}`;
+
+      // Supprime l'ancienne image du disque (optionnel mais propre)
+      const ancien = await Portfolio.findById(id);
+      if (ancien?.image) {
+        const oldPath = path.join(process.cwd(), "public", ancien.image);
+        unlink(oldPath).catch(() => {}); // ignore si le fichier n'existe pas
       }
-    );
+    }
+
+    const projet = await Portfolio.findByIdAndUpdate(id, updateData, {
+      new: true,
+      runValidators: true,
+    });
 
     if (!projet) {
-      return NextResponse.json(
-        { error: "Projet introuvable." },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Projet introuvable." }, { status: 404 });
     }
 
     return NextResponse.json(projet);
@@ -32,10 +65,7 @@ export async function PUT(request, { params }) {
     console.error("ERREUR PUT ADMIN PORTFOLIO:", error);
 
     if (error.message === "UNAUTHORIZED") {
-      return NextResponse.json(
-        { error: "Non autorisé." },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Non autorisé." }, { status: 401 });
     }
 
     return NextResponse.json(
@@ -55,10 +85,7 @@ export async function DELETE(request, { params }) {
     const projet = await Portfolio.findByIdAndDelete(id);
 
     if (!projet) {
-      return NextResponse.json(
-        { error: "Projet introuvable." },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Projet introuvable." }, { status: 404 });
     }
 
     return NextResponse.json({
@@ -69,10 +96,7 @@ export async function DELETE(request, { params }) {
     console.error("ERREUR DELETE ADMIN PORTFOLIO:", error);
 
     if (error.message === "UNAUTHORIZED") {
-      return NextResponse.json(
-        { error: "Non autorisé." },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Non autorisé." }, { status: 401 });
     }
 
     return NextResponse.json(

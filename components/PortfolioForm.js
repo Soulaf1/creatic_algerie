@@ -59,45 +59,62 @@ export default function PortfolioForm({
     }));
   }
 
-  async function handleSubmit(e) {
-    e.preventDefault();
-    setError("");
-    setLoading(true);
+const [imageFile, setImageFile] = useState(null);
+const [previewUrl, setPreviewUrl] = useState("");
 
-    try {
-      const url = isEditing
-        ? `/api/admin/portfolio/${project._id}`
-        : "/api/admin/portfolio";
-
-      const method = isEditing ? "PUT" : "POST";
-
-      const response = await fetch(url, {
-        method,
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(form),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(
-          data.error ||
-            (isEditing
-              ? "Erreur lors de la modification."
-              : "Erreur lors de la création.")
-        );
-      }
-
-      onSuccess(data);
-    } catch (error) {
-      console.error("Erreur formulaire Portfolio :", error);
-      setError(error.message);
-    } finally {
-      setLoading(false);
-    }
+function handleImageChange(e) {
+  const file = e.target.files[0];
+  if (file) {
+    setImageFile(file);
+    setPreviewUrl(URL.createObjectURL(file));
   }
+}
+
+async function handleSubmit(e) {
+  e.preventDefault();
+  setError("");
+  setLoading(true);
+
+  try {
+    const url = isEditing
+      ? `/api/admin/portfolio/${project._id}`
+      : "/api/admin/portfolio";
+
+    const method = isEditing ? "PUT" : "POST";
+
+    const formData = new FormData();
+    formData.append("titre", form.titre);
+    formData.append("categorie", form.categorie);
+    formData.append("problematique", form.problematique);
+    formData.append("solution", form.solution);
+    formData.append("resultat", form.resultat);
+
+    if (imageFile) {
+      formData.append("image", imageFile);
+    }
+
+    const response = await fetch(url, {
+      method,
+      body: formData, // pas de Content-Type manuel, le navigateur s'en charge
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(
+        data.error ||
+          (isEditing ? "Erreur lors de la modification." : "Erreur lors de la création.")
+      );
+    }
+
+    onSuccess(data);
+  } catch (error) {
+    console.error("Erreur formulaire Portfolio :", error);
+    setError(error.message);
+  } finally {
+    setLoading(false);
+  }
+}
 
   return (
     <div className="bg-white rounded-2xl shadow-[0_0_15px_rgba(5,46,120,0.08)] p-6">
@@ -162,29 +179,32 @@ export default function PortfolioForm({
           />
         </div>
 
-        {/* Image */}
-        <div>
-          <label
-            className={`block text-sm font-medium text-[#052E78] mb-2 ${inter.className}`}
-          >
-            Image
-          </label>
+{/* Image */}
+<div>
+  <label className={`block text-sm font-medium text-[#052E78] mb-2 ${inter.className}`}>
+    Image
+  </label>
 
-          <input
-            type="text"
-            name="image"
-            value={form.image}
-            onChange={handleChange}
-            required
-            className={`w-full rounded-lg border border-[#C5D4F0] bg-white px-4 py-3 text-[#444651] outline-none focus:border-[#052E78] ${inter.className}`}
-            placeholder="/dzpay.png"
-          />
+  <input
+    type="file"
+    accept="image/*"
+    onChange={handleImageChange}
+    required={!isEditing}
+    className={`w-full rounded-lg border border-[#C5D4F0] bg-white px-4 py-3 text-[#444651] outline-none focus:border-[#052E78] ${inter.className}`}
+  />
 
-          <p className={`mt-1 text-xs text-[#777] ${inter.className}`}>
-            Pour l'instant, indique le chemin de l'image située dans
-            <code className="ml-1">public/</code>.
-          </p>
-        </div>
+  {(previewUrl || form.image) && (
+    <img
+      src={previewUrl || form.image}
+      alt="Aperçu"
+      className="mt-3 w-32 h-32 object-cover rounded-lg border border-[#C5D4F0]"
+    />
+  )}
+
+  <p className={`mt-1 text-xs text-[#777] ${inter.className}`}>
+    {isEditing ? "Laisse vide pour garder l'image actuelle." : "Formats acceptés : JPG, PNG, WebP."}
+  </p>
+</div>
 
         {/* Problématique */}
         <div>
