@@ -1,6 +1,9 @@
+import connectDB from "@/lib/db";
+import Temoignage from "@/models/Temoignage";
 import Image from 'next/image';
 import Link from 'next/link';
 import { Hanken_Grotesk, Poppins, Inter } from 'next/font/google';
+export const dynamic = "force-dynamic";
 
 const hanken = Hanken_Grotesk({
   subsets: ['latin'],
@@ -17,7 +20,28 @@ const inter = Inter({
   weight: ['400', '500'],
 });
 
-export default function AProposPage() {
+export default async function AProposPage() {
+  await connectDB();
+
+  const temoignagesData = await Temoignage.find().sort({ createdAt: -1 }).lean();
+
+  // Génère des initiales et une couleur à partir du nom
+  const couleurs = ['bg-green-500', 'bg-blue-500', 'bg-purple-500', 'bg-orange-500', 'bg-pink-500'];
+
+  const temoignages = temoignagesData.map((t, i) => ({
+    _id: t._id.toString(),
+    nom: t.nom,
+    poste: t.entreprise,
+    citation: t.citation,
+    etoiles: t.etoiles,
+    initiales: t.nom
+      .split(" ")
+      .map((mot) => mot[0])
+      .join("")
+      .slice(0, 2)
+      .toUpperCase(),
+    couleur: couleurs[i % couleurs.length],
+  }));
   return (
     <main>
 
@@ -154,60 +178,43 @@ export default function AProposPage() {
     </div>
 
     {/* Cartes */}
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-      {[
-        {
-          initiales: 'RL',
-          couleur: 'bg-green-500',
-          nom: 'Ryad Lamine',
-          poste: 'CEO @ TechAlgs',
-          citation: "L'approche structurelle de CREATIC est inégalée. Ils ont refondu notre plateforme avec une précision chirurgicale, respectant chaque délai annoncé.",
-        },
-        {
-          initiales: 'SM',
-          couleur: 'bg-green-500',
-          nom: 'Sarah Mansouri',
-          poste: 'Directrice Marketing',
-          citation: "Un partenaire stratégique plus qu'un simple prestataire. Leur compréhension du marché algérien a fait toute la différence pour notre lancement digital.",
-        },
-        {
-          initiales: 'KB',
-          couleur: 'bg-green-500',
-          nom: 'Karim Belkadi',
-          poste: 'Fondateur @ BioZen',
-          citation: "L'équipe a su traduire nos idées complexes en une interface fluide et intuitive. Les retours de nos clients sont excellents depuis la mise en ligne.",
-        },
-      ].map((temoignage, i) => (
-        <div
-          key={i}
-          className="bg-white rounded-2xl p-6 shadow-[0_0_20px_rgba(5,46,120,0.08)] hover:-translate-y-2 transition-transform duration-300"
-        >
-          {/* Auteur en premier */}
-          <div className="flex items-center gap-3 mb-4">
-            <div className={`w-10 h-10 ${temoignage.couleur} rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0 ${hanken.className}`}>
-              {temoignage.initiales}
+    {temoignages.length === 0 ? (
+      <p className={`text-center text-[#444651] ${inter.className}`}>
+        Aucun témoignage pour le moment.
+      </p>
+    ) : (
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+        {temoignages.map((temoignage) => (
+          <div
+            key={temoignage._id}
+            className="bg-white rounded-2xl p-6 shadow-[0_0_20px_rgba(5,46,120,0.08)] hover:-translate-y-2 transition-transform duration-300"
+          >
+            {/* Auteur */}
+            <div className="flex items-center gap-3 mb-4">
+              <div className={`w-10 h-10 ${temoignage.couleur} rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0 ${hanken.className}`}>
+                {temoignage.initiales}
+              </div>
+              <div>
+                <p className={`text-[#052E78] font-bold text-sm ${hanken.className}`}>{temoignage.nom}</p>
+                <p className={`text-[#444651] text-xs ${inter.className}`}>{temoignage.poste}</p>
+              </div>
             </div>
-            <div>
-              <p className={`text-[#052E78] font-bold text-sm ${hanken.className}`}>{temoignage.nom}</p>
-              <p className={`text-[#444651] text-xs ${inter.className}`}>{temoignage.poste}</p>
+
+            {/* Étoiles dynamiques */}
+            <div className="flex gap-1 mb-4">
+              {[...Array(temoignage.etoiles)].map((_, j) => (
+                <span key={j} className="text-yellow-400 text-sm">★</span>
+              ))}
             </div>
+
+            {/* Citation */}
+            <p className={`text-[#444651] text-sm leading-relaxed italic ${inter.className}`}>
+              "{temoignage.citation}"
+            </p>
           </div>
-
-          {/* Étoiles */}
-          <div className="flex gap-1 mb-4">
-            {[...Array(5)].map((_, j) => (
-              <span key={j} className="text-yellow-400 text-sm">★</span>
-            ))}
-          </div>
-
-          {/* Citation */}
-          <p className={`text-[#444651] text-sm leading-relaxed italic ${inter.className}`}>
-            "{temoignage.citation}"
-          </p>
-
-        </div>
-      ))}
-    </div>
+        ))}
+      </div>
+    )}
 
   </div>
 </section>
