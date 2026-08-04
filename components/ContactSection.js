@@ -25,6 +25,16 @@ const [loading, setLoading] = useState(false);
 const handleSubmit = async (e) => {
   e.preventDefault();
 
+   if (
+    !formData.name.trim() ||
+    !formData.email.trim() ||
+    !formData.phone.trim() ||
+    !formData.message.trim()
+  ) {
+    alert("Veuillez remplir tous les champs.");
+    return;
+  }
+
   setLoading(true);
 
   try {
@@ -85,6 +95,7 @@ const handleSubmit = async (e) => {
 
                  <input
                  type="text"
+                  required
                  name="name"
                  value={formData.name}
                  onChange={(e) =>
@@ -106,6 +117,7 @@ const handleSubmit = async (e) => {
 
                   <input
                     type="email"
+                     required
                     placeholder="m.amine@entreprise.dz"
                     className={`w-full rounded-lg border border-[#C4C6D3] bg-[#F4F7FF] px-4 py-4 text-[#444651] placeholder:text-[#6B7280] outline-none transition-all duration-300 focus:border-[#274690] focus:ring-2 focus:ring-[#274690]/10 ${inter.className}`}
                     name="email"
@@ -131,6 +143,7 @@ const handleSubmit = async (e) => {
 
                 <input
                   type="text"
+                   required
                   placeholder="+213 (0) ..."
                   className={`w-full rounded-lg border border-[#C4C6D3] bg-[#F4F7FF] px-4 py-4 text-[#444651] placeholder:text-[#6B7280] outline-none transition-all duration-300 focus:border-[#274690] focus:ring-2 focus:ring-[#274690]/10 ${inter.className}`}
                name="phone"
@@ -153,6 +166,7 @@ const handleSubmit = async (e) => {
                 </label>
 
                 <textarea
+                 required
                   rows={4}
                   placeholder="Dites-nous en plus sur vos objectifs et vos besoins techniques..."
                   className={`w-full resize-none rounded-lg border border-[#C4C6D3] bg-[#F4F7FF] px-4 py-4 text-[#444651] placeholder:text-[#6B7280] outline-none transition-all duration-300 focus:border-[#274690] focus:ring-2 focus:ring-[#274690]/10 ${inter.className}`}
