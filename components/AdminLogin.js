@@ -168,13 +168,9 @@ export default function LoginPage() {
 
         </form>
 
-        {/* Mot de passe oublié */}
+        
 
-        <p
-          className={`text-center text-sm text-[#052E78] mt-6 cursor-pointer hover:underline ${inter.className}`}
-        >
-          Mot de passe oublié ?
-        </p>
+  
 
         {/* Ligne */}
 
