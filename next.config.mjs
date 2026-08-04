@@ -1,3 +1,3 @@
 const nextConfig = {};
 
-export default nextConfig;git add .
+export default nextConfig;
