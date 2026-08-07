@@ -2,9 +2,7 @@ import { NextResponse } from "next/server";
 import dbConnect from "@/lib/db";
 import Portfolio from "@/models/Portfolio";
 import { verifyAdmin } from "@/lib/verifyAdmin";
-import { writeFile } from "fs/promises";
-import path from "path";
-import { randomUUID } from "crypto";
+import cloudinary from "@/lib/cloudinary";
 
 export async function GET(request) {
   try {
@@ -46,18 +44,19 @@ export async function POST(request) {
       );
     }
 
-    // Génère un nom de fichier unique pour éviter les conflits
-    const extension = path.extname(file.name);
-    const fileName = `${randomUUID()}${extension}`;
-    const uploadDir = path.join(process.cwd(), "public", "uploads", "portfolio");
-    const filePath = path.join(uploadDir, fileName);
-
+    // Upload vers Cloudinary
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    await writeFile(filePath, buffer);
-
-    const imagePath = `/uploads/portfolio/${fileName}`;
+    const uploadResult = await new Promise((resolve, reject) => {
+      cloudinary.uploader.upload_stream(
+        { folder: "creatic-algerie/portfolio" },
+        (error, result) => {
+          if (error) reject(error);
+          else resolve(result);
+        }
+      ).end(buffer);
+    });
 
     const projet = await Portfolio.create({
       titre,
@@ -65,7 +64,7 @@ export async function POST(request) {
       problematique,
       solution,
       resultat,
-      image: imagePath,
+      image: uploadResult.secure_url,
     });
 
     return NextResponse.json(projet, { status: 201 });

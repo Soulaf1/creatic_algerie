@@ -2,9 +2,7 @@ import { NextResponse } from "next/server";
 import dbConnect from "@/lib/db";
 import Portfolio from "@/models/Portfolio";
 import { verifyAdmin } from "@/lib/verifyAdmin";
-import { writeFile, unlink } from "fs/promises";
-import path from "path";
-import { randomUUID } from "crypto";
+import cloudinary from "@/lib/cloudinary";
 
 export async function PUT(request, { params }) {
   try {
@@ -29,25 +27,29 @@ export async function PUT(request, { params }) {
       resultat,
     };
 
-    // Si une nouvelle image a été envoyée (pas juste un texte vide)
-    if (file && typeof file !== "string") {
-      const extension = path.extname(file.name);
-      const fileName = `${randomUUID()}${extension}`;
-      const uploadDir = path.join(process.cwd(), "public", "uploads", "portfolio");
-      const filePath = path.join(uploadDir, fileName);
-
+    // Si une nouvelle image a été envoyée
+    if (file && typeof file !== "string" && file.size > 0) {
       const bytes = await file.arrayBuffer();
       const buffer = Buffer.from(bytes);
 
-      await writeFile(filePath, buffer);
+      // Upload nouvelle image sur Cloudinary
+      const uploadResult = await new Promise((resolve, reject) => {
+        cloudinary.uploader.upload_stream(
+          { folder: "creatic-algerie/portfolio" },
+          (error, result) => {
+            if (error) reject(error);
+            else resolve(result);
+          }
+        ).end(buffer);
+      });
 
-      updateData.image = `/uploads/portfolio/${fileName}`;
+      updateData.image = uploadResult.secure_url;
 
-      // Supprime l'ancienne image du disque (optionnel mais propre)
+      // Supprime l'ancienne image de Cloudinary
       const ancien = await Portfolio.findById(id);
-      if (ancien?.image) {
-        const oldPath = path.join(process.cwd(), "public", ancien.image);
-        unlink(oldPath).catch(() => {}); // ignore si le fichier n'existe pas
+      if (ancien?.image && ancien.image.includes('cloudinary')) {
+        const publicId = ancien.image.split('/').slice(-2).join('/').split('.')[0];
+        await cloudinary.uploader.destroy(publicId).catch(() => {});
       }
     }
 
@@ -82,11 +84,19 @@ export async function DELETE(request, { params }) {
 
     const { id } = await params;
 
-    const projet = await Portfolio.findByIdAndDelete(id);
+    const projet = await Portfolio.findById(id);
 
     if (!projet) {
       return NextResponse.json({ error: "Projet introuvable." }, { status: 404 });
     }
+
+    // Supprime l'image de Cloudinary
+    if (projet.image && projet.image.includes('cloudinary')) {
+      const publicId = projet.image.split('/').slice(-2).join('/').split('.')[0];
+      await cloudinary.uploader.destroy(publicId).catch(() => {});
+    }
+
+    await Portfolio.findByIdAndDelete(id);
 
     return NextResponse.json({
       success: true,

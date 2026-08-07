@@ -225,22 +225,19 @@ export default function AdminPortfolio() {
                             key={project._id}
                             className="border-t border-gray-100 hover:bg-[#F8FAFF] transition"
                           >
-                            {/* Image */}
-                            <td className="px-6 py-4">
-                              <div className="w-14 h-12 rounded-lg overflow-hidden bg-[#E5EEFF]">
-                                {project.image ? (
-                                  <img
-                                    src={
-                                      project.image.startsWith("/")
-                                        ? project.image
-                                        : `/${project.image}`
-                                    }
-                                    alt={project.titre}
-                                    className="w-full h-full object-cover"
-                                  />
-                                ) : null}
-                              </div>
-                            </td>
+                           {/* Image */}
+<td className="px-6 py-4">
+  <div className="w-14 h-12 rounded-lg overflow-hidden bg-[#E5EEFF]">
+    {project.image ? (
+      <img
+        src={project.image}
+        alt={project.titre}
+        className="w-full h-full object-cover"
+        onError={(e) => e.target.style.display = 'none'}
+      />
+    ) : null}
+  </div>
+</td>
 
                             {/* Titre */}
                             <td className="px-6 py-4">
