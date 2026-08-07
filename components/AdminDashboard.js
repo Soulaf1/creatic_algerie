@@ -93,16 +93,18 @@ useEffect(() => {
                         key={project._id || index}
                         className="flex items-center gap-4"
                       >
-                        {/* Image */}
-                        <div className="w-14 h-14 rounded-lg overflow-hidden bg-[#E5EEFF] shrink-0">
-                          {project.image ? (
-                            <img
-                              src={project.image?.startsWith("/") ? project.image : `/${project.image}`}
-                              alt={project.titre || "Projet"}
-                              className="w-full h-full object-cover"
-                            />
-                          ) : null}
-                        </div>
+                      
+                   {/* Image */}
+<div className="w-14 h-14 rounded-lg overflow-hidden bg-[#E5EEFF] shrink-0">
+  {project.image ? (
+    <img
+      src={project.image}
+      alt={project.titre || "Projet"}
+      className="w-full h-full object-cover"
+      onError={(e) => e.target.style.display = 'none'}
+    />
+  ) : null}
+</div>
 
                         {/* Infos */}
                         <div className="flex-1 min-w-0">
