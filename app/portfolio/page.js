@@ -16,14 +16,32 @@ export default function Portfolio() {
     fetch('/api/portfolio')
       .then(res => res.json())
       .then(data => {
-        setProjets(data);
-        setLoading(false);
-      });
+
+  setProjets(data);
+  setLoading(false);
+});
   }, []);
 
-  const projetsFiltres = filtreActif === "Tous"
+  const projetsFiltres =
+  filtreActif === "Tous"
     ? projets
-    : projets.filter(p => p.categorie === filtreActif);
+    : projets.filter((projet) => {
+        const categorie = projet.categorie?.toLowerCase().trim();
+
+        if (filtreActif === "Web") {
+          return categorie === "web";
+        }
+
+        if (filtreActif === "Mobile") {
+          return categorie === "app mobile";
+        }
+
+        if (filtreActif === "E-commerce") {
+          return categorie === "e-commerce";
+        }
+
+        return false;
+      });
 
   const totalPages = Math.ceil(projetsFiltres.length / CARDS_PER_PAGE);
   const projetsPagines = projetsFiltres.slice(
@@ -136,8 +154,23 @@ export default function Portfolio() {
                   >
                     {projet.titre}
                   </h3>
-                 <div className="w-12 h-12 rounded-xl bg-[#EEF2F7] flex items-center justify-center flex-shrink-0 ml-2">                    {projet.categorie === "E-commerce" ? "🛒" : projet.categorie === "Mobile" ? "💳" : "🏭"}
-                  </div>
+                 <div className="w-12 h-12 rounded-xl bg-[#EEF2F7] flex items-center justify-center flex-shrink-0 ml-2">
+  <svg
+    width="22"
+    height="22"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="#6B7280"
+    strokeWidth="1.8"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <rect x="3" y="3" width="18" height="18" rx="2" />
+    <path d="M3 9h18" />
+    <path d="M8 6h.01" />
+    <path d="M12 6h.01" />
+  </svg>
+</div>
                 </div>
 
                 {/* SECTEUR */}
