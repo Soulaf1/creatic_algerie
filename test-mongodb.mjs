@@ -6,7 +6,7 @@ dotenv.config({ path: ".env.local" });
 console.log("MONGODB_URI présente :", !!process.env.MONGODB_URI);
 
 if (!process.env.MONGODB_URI) {
-  console.error("❌ MONGODB_URI introuvable dans .env.local");
+  console.error("❌ MONGODB_URI n'est pas chargée.");
   process.exit(1);
 }
 
@@ -17,7 +17,8 @@ try {
     serverSelectionTimeoutMS: 10000,
   });
 
-  console.log("✅ CONNEXION MONGODB RÉUSSIE");
+  console.log("✅ MongoDB connecté !");
+  console.log("Base :", mongoose.connection.name);
 
   await mongoose.disconnect();
 } catch (error) {

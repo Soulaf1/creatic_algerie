@@ -161,23 +161,45 @@ async function handleSubmit(e) {
         </div>
 
         {/* Catégorie */}
-        <div>
-          <label
-            className={`block text-sm font-medium text-[#052E78] mb-2 ${inter.className}`}
-          >
-            Catégorie
-          </label>
+<div>
+  <label
+    className={`block text-sm font-medium text-[#052E78] mb-2 ${inter.className}`}
+  >
+    Catégorie
+  </label>
 
-          <input
-            type="text"
-            name="categorie"
-            value={form.categorie}
-            onChange={handleChange}
-            required
-            className={`w-full rounded-lg border border-[#C5D4F0] bg-white px-4 py-3 text-[#444651] outline-none focus:border-[#052E78] ${inter.className}`}
-            placeholder="Ex. Application mobile"
-          />
-        </div>
+  <select
+    name="categorie"
+    value={form.categorie}
+    onChange={handleChange}
+    required
+    className={`w-full rounded-lg border border-[#C5D4F0] bg-white px-4 py-3 text-[#444651] outline-none focus:border-[#052E78] ${inter.className}`}
+  >
+    <option value="" disabled>
+      Sélectionnez une catégorie
+    </option>
+
+    <option value="siteweb">
+      Site web
+    </option>
+
+    <option value="application mobile">
+      Application mobile
+    </option>
+
+    <option value="e-commerce">
+      E-commerce
+    </option>
+
+    <option value="maintenance & support">
+      Maintenance & support
+    </option>
+
+    <option value="hébergement web">
+      Hébergement web
+    </option>
+  </select>
+</div>
 
 {/* Image */}
 <div>
