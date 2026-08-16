@@ -12,9 +12,9 @@ const inter = Inter({
 });
 
 const stats = [
-  { number: '150+', label: 'PROJETS LIVRÉS' },
-  { number: '98%', label: 'SATISFACTION CLIENT' },
-  { number: '8 Ans', label: "D'EXPÉRIENCE" },
+  { number: '20+', label: 'PROJETS LIVRÉS' },
+  { number: '50%', label: 'SATISFACTION CLIENT' },
+  { number: '9 Ans', label: "D'EXPÉRIENCE" },
 ];
 
 export default function StatsSection() {

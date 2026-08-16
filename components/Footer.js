@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { Hanken_Grotesk, Inter } from "next/font/google";
+import { FaInstagram, FaFacebookF, FaLinkedinIn } from "react-icons/fa";
 
 const hanken = Hanken_Grotesk({
   subsets: ["latin"],
@@ -61,13 +62,37 @@ export default function Footer() {
               LIENS RAPIDES
             </h3>
 
-            <ul className="space-y-2">
-              <li><Link href="/">Accueil</Link></li>
-              <li><Link href="/services">Services</Link></li>
-              <li><Link href="/portfolio">Portfolio</Link></li>
-              <li><Link href="/apropos">À propos</Link></li>
-              <li><Link href="/contact">Contact</Link></li>
-            </ul>
+            <ul className={`space-y-2 text-[#444651] ${inter.className}`}>
+  <li>
+    <Link href="/" className="hover:text-[#052E78] transition">
+      Accueil
+    </Link>
+  </li>
+
+  <li>
+    <Link href="/services" className="hover:text-[#052E78] transition">
+      Services
+    </Link>
+  </li>
+
+  <li>
+    <Link href="/portfolio" className="hover:text-[#052E78] transition">
+      Portfolio
+    </Link>
+  </li>
+
+  <li>
+    <Link href="/apropos" className="hover:text-[#052E78] transition">
+      À propos
+    </Link>
+  </li>
+
+  <li>
+    <Link href="/contact" className="hover:text-[#052E78] transition">
+      Contact
+    </Link>
+  </li>
+</ul>
           </div>
 
           {/* Contact */}
@@ -76,11 +101,11 @@ export default function Footer() {
               CONTACT
             </h3>
 
-            <ul className={`space-y-3 ${inter.className}`}>
-              <li>+213 (0) 23 XX XX XX</li>
-              <li>contact@creatic-algerie.dz</li>
-              <li>Alger, Algérie</li>
-            </ul>
+            <ul className={`space-y-3 text-[#444651] ${inter.className}`}>
+  <li>+213 (0) 555136900</li>
+  <li>contact@creatic-algerie.dz</li>
+  <li>Alger, Algérie</li>
+</ul>
           </div>
 
           {/* Réseaux */}
@@ -90,17 +115,35 @@ export default function Footer() {
             </h3>
 
             <div className="flex gap-3">
-              <a href="#" className="w-10 h-10 bg-[#052E78] rounded-lg"></a>
-              <a href="#" className="w-10 h-10 bg-[#052E78] rounded-lg"></a>
-              <a href="#" className="w-10 h-10 bg-[#052E78] rounded-lg"></a>
-            </div>
+  {/* Instagram */}
+  <a
+    href="https://www.instagram.com/creaticalgerie"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="w-10 h-10 bg-[#052E78] rounded-lg flex items-center justify-center text-white hover:bg-[#274690] transition"
+  >
+    <FaInstagram size={20} />
+  </a>
+
+  {/* Facebook */}
+  <a
+    href="https://facebook.com/CreaticAlgerie"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="w-10 h-10 bg-[#052E78] rounded-lg flex items-center justify-center text-white hover:bg-[#274690] transition"
+  >
+    <FaFacebookF size={20} />
+  </a>
+</div>
           </div>
 
         </div>
 
-        <div className={`border-t border-[#c5d4f0] mt-8 pt-6 text-center text-sm ${inter.className}`}>
-          Copyright © 2026 CREATIC-ALGERIE. Tous droits réservés.
-        </div>
+        <div
+  className={`border-t border-[#c5d4f0] mt-8 pt-6 text-center text-sm text-[#444651] ${inter.className}`}
+>
+  Copyright © 2026 CREATIC-ALGERIE. Tous droits réservés.
+</div>
       </div>
     </footer>
   );
