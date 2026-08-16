@@ -255,7 +255,7 @@ className={`text-[#A0B8FF] text-xs mb-1 ${inter.className}`}        >
 
         <h3
 className={`text-white text-base font-semibold leading-tight ${poppins.className}`}        >
-          +213 (0) 550 00 00 00
+          +213 (0) 555136900
         </h3>
 
       </div>
@@ -299,9 +299,7 @@ className={`text-[#A0B8FF] text-xs mb-1 ${inter.className}`}        >
 
         <h3
 className={`text-white text-base font-semibold break-words ${poppins.className}`}        >
-          contact@creatic-
-          <br />
-          algerie.dz
+          contact@creatic-algerie.dz
         </h3>
 
       </div>
@@ -347,9 +345,7 @@ className={`text-[#A0B8FF] text-xs mb-1 ${inter.className}`}
         <h3
 className={`text-white text-base font-semibold leading-tight ${poppins.className}`}
         >
-          Hydra, Alger,
-          <br />
-          Algérie
+           Immeuble Cilla II rue Kara hacen Bir Mourad Raïs -Alger,Algérie
         </h3>
 
       </div>
