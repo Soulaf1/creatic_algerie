@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import Image from "next/image";
-
+import Link from "next/link";
 const CARDS_PER_PAGE = 3;
 
 export default function Portfolio() {
@@ -118,17 +118,47 @@ export default function Portfolio() {
         )}
       </section>
 
-      {/* CTA */}
-      <section className="bg-[#F0F4FF] py-12 md:py-20">
-        <div className="bg-white py-12 md:py-16 px-6 text-center w-full">
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#052E78] mb-4" style={{ fontFamily: "var(--font-poppins)" }}>Votre projet mérite l'excellence.</h2>
-          <p className="text-sm md:text-base text-[#444651] mb-8 max-w-lg mx-auto leading-relaxed" style={{ fontFamily: "var(--font-inter)" }}>Transformons ensemble vos défis commerciaux en avantages technologiques compétitifs avec CREATIC-ALGERIE.</p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <button className="px-8 py-3 bg-[#052E78] text-white font-semibold rounded-md hover:bg-[#041f52] transition-all duration-200" style={{ fontFamily: "var(--font-poppins)" }}>Demander un devis</button>
-            <button className="px-8 py-3 bg-transparent text-[#052E78] font-semibold rounded-md border-2 border-[#052E78] hover:bg-[#052E78] hover:text-white transition-all duration-200" style={{ fontFamily: "var(--font-poppins)" }}>Voir nos services</button>
-          </div>
-        </div>
-      </section>
+ {/* CTA SECTION */}
+<section className="bg-[#F0F4FF] py-12 md:py-20">
+  
+  <div className="bg-white py-12 md:py-16 px-6 text-center w-full">
+    
+    <h2
+      className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#052E78] mb-4"
+      style={{ fontFamily: "var(--font-poppins)" }}
+    >
+      Votre projet mérite l'excellence.
+    </h2>
+
+    <p
+      className="text-sm md:text-base text-[#444651] mb-8 max-w-lg mx-auto leading-relaxed"
+      style={{ fontFamily: "var(--font-inter)" }}
+    >
+      Transformons ensemble vos défis commerciaux en avantages technologiques
+      compétitifs avec CREATIC-ALGERIE.
+    </p>
+
+    <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+  <Link
+    href="/devis"
+    className="px-8 py-3 bg-[#052E78] text-white font-semibold rounded-md hover:bg-[#041f52] transition-all duration-200 whitespace-nowrap"
+    style={{ fontFamily: "var(--font-poppins)" }}
+  >
+    Demander un devis
+  </Link>
+
+  <Link
+    href="/services"
+    className="px-8 py-3 bg-transparent text-[#052E78] font-semibold rounded-md border-2 border-[#052E78] hover:bg-[#052E78] hover:text-white transition-all duration-200 whitespace-nowrap"
+    style={{ fontFamily: "var(--font-poppins)" }}
+  >
+    Voir nos services
+  </Link>
+</div>
+
+  </div>
+
+</section>
     </main>
   );
 }
