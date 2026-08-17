@@ -433,9 +433,9 @@ const handleSubmit = async () => {
                 </h3>
                 <div className="flex flex-col gap-3 mb-4">
                   {[
-                    { icon: <Phone size={16} />, text: '+213 (0) 23 00 00 00' },
+                    { icon: <Phone size={16} />, text: '+213 (0) 555136900' },
                     { icon: <MessageCircle size={16} />, text: 'WhatsApp Direct' },
-                    { icon: <Mail size={16} />, text: 'contact@creatic-algerie.com' },
+                    { icon: <Mail size={16} />, text: 'contact@creatic-algerie.dz' },
                   ].map((item, i) => (
                     <div key={i} className={`flex items-center gap-2 text-white text-sm ${inter.className}`}>
                       <span className="text-white">{item.icon}</span>

@@ -98,7 +98,7 @@ export async function POST(request) {
 
     // --- Email 2 : confirmation automatique au client ---
     const mailToClient = {
-      from: `"Votre Entreprise" <${process.env.GMAIL_USER}>`,
+      from: `"Creatic_Algerie" <${process.env.GMAIL_USER}>`,
       to: data.email,
       subject: 'Nous avons bien reçu votre demande de devis',
       html: `
@@ -107,7 +107,7 @@ export async function POST(request) {
         <p>Notre équipe va étudier votre projet et revient vers vous <strong>sous 48h</strong> avec une proposition personnalisée.</p>
         <p>En attendant, n'hésitez pas à consulter nos réalisations sur notre site.</p>
         <br>
-        <p>Cordialement,<br>L'équipe</p>
+        <p>Cordialement,<br>L'équipe Creatic</p>
       `,
     };
 
