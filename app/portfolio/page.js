@@ -20,16 +20,16 @@ export default function Portfolio() {
       .catch(() => setLoading(false));
   }, []);
 
-  const projetsFiltres =
-    filtreActif === "Tous"
-      ? projets
-      : projets.filter((projet) => {
-          const categorie = projet.categorie?.toLowerCase().trim();
-          if (filtreActif === "Web") return categorie === "web";
-          if (filtreActif === "Mobile") return categorie === "app mobile";
-          if (filtreActif === "E-commerce") return categorie === "e-commerce";
-          return false;
-        });
+const projetsFiltres =
+  filtreActif === "Tous"
+    ? projets
+    : projets.filter((projet) => {
+        const categorie = projet.categorie?.toLowerCase().trim();
+        if (filtreActif === "Web") return categorie === "siteweb";
+        if (filtreActif === "Mobile") return categorie === "application mobile";
+        if (filtreActif === "E-commerce") return categorie === "e-commerce";
+        return false;
+      });
 
   const totalPages = Math.ceil(projetsFiltres.length / CARDS_PER_PAGE);
   const projetsPagines = projetsFiltres.slice(
